@@ -4,29 +4,30 @@ import { Button } from "@/components/ui/button";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoAddCss = false;
-import Link from "next/link";
 
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export const NavButton = ({
   isActive,
-  onClick,
+  href,
   children,
 }: {
   isActive: boolean;
-  onClick: () => void;
+  href: string;
   children: React.ReactNode;
 }) => {
   return (
-    <Button
-      onClick={onClick}
-      className={isActive ? "bg-[#FDFDFD] text-[#240046]" : "text-[#fdfdfd]"}
-      variant={isActive ? "secondary" : "ghost"}
-    >
-      {children}
-    </Button>
+    <Link href={href}>
+      <Button
+        className={isActive ? "bg-[#FDFDFD] text-[#240046]" : "text-[#fdfdfd]"}
+        variant={isActive ? "secondary" : "ghost"}
+      >
+        {children}
+      </Button>
+    </Link>
   );
 };
 
@@ -53,8 +54,6 @@ export const NavProfile = ({
 };
 
 export const Navbar = () => {
-  const [url, setUrl] = useState("/");
-
   return (
     <nav className="w-full h-16 p-8 items-center justify-between flex gap-6 bg-[#240046]">
       <div className="flex items-center gap-4">
@@ -62,19 +61,15 @@ export const Navbar = () => {
 
         {/* Navigation Links */}
         <div className="flex gap-2">
-          <Link href="/">
-            <NavButton isActive={url === "/"} onClick={() => setUrl("/")}>
-              Find match!
-            </NavButton>
-          </Link>
-          <Link href="/study_sessions">
-            <NavButton
-              isActive={url === "/study_sessions"}
-              onClick={() => setUrl("/study_sessions")}
-            >
-              Study Session
-            </NavButton>
-          </Link>
+          <NavButton href="/" isActive={usePathname() === "/"}>
+            Find match!
+          </NavButton>
+          <NavButton
+            href="/study_sessions"
+            isActive={usePathname() === "/study_sessions"}
+          >
+            Study Session
+          </NavButton>
         </div>
       </div>
 
