@@ -54,7 +54,6 @@ export const NavProfile = ({
 };
 
 export const Navbar = () => {
-  if (usePathname() === "/") return;
   return (
     <nav className="w-full h-16 p-8 items-center justify-between flex gap-6 bg-[#240046]">
       <div className="flex items-center gap-4">
@@ -62,10 +61,13 @@ export const Navbar = () => {
 
         {/* Navigation Links */}
         <div className="flex gap-2">
-          <NavButton href="/home" isActive={usePathname() === "/home"}>
+          <NavButton href="/home" isActive={usePathname() === "/"}>
             Find match!
           </NavButton>
-          <NavButton href="/sessions" isActive={usePathname() === "/sessions"}>
+          <NavButton
+            href="/study_sessions"
+            isActive={usePathname() === "/sessions"}
+          >
             Study Session
           </NavButton>
         </div>
