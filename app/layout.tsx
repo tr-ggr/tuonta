@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import localFont from "next/font/local";
 import "./globals.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="flex flex-col w-screen h-screen">
         <Navbar></Navbar>
         {children}
       </body>
