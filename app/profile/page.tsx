@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import HobbiesModal from "./modals/hobbies"; // Import your modal component
+import ProfilePicsEdit from "./profilepicsedit"; // Import the ProfilePicsEdit component
 import ProfilePics from "./profilepics"; // Import the ProfilePics component
 
 export default function ProfileSettingsPage() {
@@ -13,18 +14,27 @@ export default function ProfileSettingsPage() {
   const [school, setSchool] = useState("Cebu Institute of Technology - University");
   const [course, setCourse] = useState("BSCS - 3");
   const [distance, setDistance] = useState(30);
-  const [socials, setSocials] = useState(["Facebook", "Twitter"]);
-  const [hobbies, setHobbies] = useState<string[]>([]); // Explicit type for hobbies
+  const [hobbies, setHobbies] = useState<string[]>([]);
+  const [profileImages, setProfileImages] = useState<string[]>(new Array(6).fill(""));
+
+  // State to control whether ProfilePics or ProfilePicsEdit is shown
+  const [isEditingProfilePics, setIsEditingProfilePics] = useState(false);
+
   const [showHobbiesModal, setShowHobbiesModal] = useState(false);
 
   const handleSaveHobbies = (selectedHobbies: string[]) => {
-    setHobbies(selectedHobbies); // Save selected hobbies, including "Other"
-    setShowHobbiesModal(false); // Close the modal
+    setHobbies(selectedHobbies);
+    setShowHobbiesModal(false);
+  };
+
+  const handleSaveProfilePics = (updatedImages: string[]) => {
+    setProfileImages(updatedImages);
+    setIsEditingProfilePics(false); // Return to ProfilePics after saving
   };
 
   return (
-    <div className="h-screen bg-gray-200 flex overflow-hidden"> {/* Prevent page scroll */}
-      {/* Profile Settings Section - Moved to the left */}
+    <div className="h-screen bg-gray-200 flex overflow-hidden">
+      {/* Profile Settings Section */}
       <div className="w-full max-w-3xl overflow-y-auto bg-[#f2e1fc] p-6 border border-gray-300 rounded-lg">
         <h1 className="text-2xl font-semibold mb-4 text-center">Profile Settings</h1>
 
@@ -156,18 +166,33 @@ export default function ProfileSettingsPage() {
           </button>
         </div>
       </div>
-
-      {/* Profile Pics Section - Moved to the right */}
-      <div className="w-full max-w-3xl flex justify-center items-center p-4">
-        <ProfilePics /> {/* Add the ProfilePics component here */}
-      </div>
+{/* Profile Pics Section */}
+<div className="w-full max-w-3xl flex justify-center items-center p-4">
+  {isEditingProfilePics ? (
+    <ProfilePicsEdit
+      initialImages={profileImages}
+      onSaveChanges={handleSaveProfilePics}
+    />
+  ) : (
+    <ProfilePics
+      images={profileImages}
+      onEdit={() => setIsEditingProfilePics(true)} // Show ProfilePicsEdit when editing
+      name="Jake Bajo" // Pass name
+      birthday="2002-01-01" // Pass birthday
+      course="BSCS" // Pass course
+      year={3} // Pass year
+      school="Cebu Institute of Technology - University" // Pass school
+      bio="i love you"
+    />
+  )}
+</div>
 
       {/* Modal */}
       {showHobbiesModal && (
         <HobbiesModal
           onClose={() => setShowHobbiesModal(false)}
           onSave={handleSaveHobbies}
-          initialHobbies={hobbies} // Pass the hobbies from the parent state
+          initialHobbies={hobbies}
         />
       )}
     </div>
