@@ -7,8 +7,10 @@ interface ProfilePicsProps {
   course: string;
   year: number;
   school: string;
-  bio: string;  // Added bio field
-  onEdit: () => void;
+  bio: string;
+  onEdit?: () => void; // Made optional for cases where it's not used
+  approved: boolean; // Added approved prop
+  hideEditButton?: boolean; // New prop to hide edit button
 }
 
 const ProfilePics: React.FC<ProfilePicsProps> = ({
@@ -20,6 +22,8 @@ const ProfilePics: React.FC<ProfilePicsProps> = ({
   school,
   bio,
   onEdit,
+  approved,
+  hideEditButton, // Destructure the new prop
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [age, setAge] = useState<number>(0);
@@ -50,7 +54,7 @@ const ProfilePics: React.FC<ProfilePicsProps> = ({
           {images.length > 0 ? (
             <img
               src={images[currentIndex]}
-              alt={`Profile ${currentIndex + 1}`}
+              alt={`${currentIndex + 1}`}
               className="w-full h-full object-cover rounded-full"
             />
           ) : (
@@ -69,19 +73,25 @@ const ProfilePics: React.FC<ProfilePicsProps> = ({
 
         {/* User Details Section */}
         <div className="flex flex-col gap-4 text-left w-full">
-          <div className="text-2xl font-bold text-black border-b border-black">{name}</div>
+          <div className="text-2xl font-bold text-black border-b border-black">
+            {name} {approved && <span className="text-green-500">✔️</span>}
+          </div>
           <div className="text-lg text-black">{age} years old</div>
-          <div className="text-2xl font-bold text-black border-b border-black">{course} - {year}</div>
+          <div className="text-2xl font-bold text-black border-b border-black">
+            {course} - {year}
+          </div>
           <div className="text-lg text-black">{school}</div>
         </div>
 
-        {/* Edit Button */}
-        <button
-          className="w-full h-[60px] p-3 bg-[#4530a7] rounded-[30px] text-white text-xl font-semibold mt-4"
-          onClick={onEdit}
-        >
-          Edit Picture
-        </button>
+        {/* Conditionally Render Edit Button */}
+        {!hideEditButton && (
+          <button
+            className="w-full h-[60px] p-3 bg-[#4530a7] rounded-[30px] text-white text-xl font-semibold mt-4"
+            onClick={onEdit}
+          >
+            Edit Picture
+          </button> 
+        )}
       </div>
     </div>
   );

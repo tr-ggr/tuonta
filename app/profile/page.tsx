@@ -181,6 +181,7 @@ export default function ProfileSettingsPage() {
       birthday="2002-01-01" // Pass birthday
       course="BSCS" // Pass course
       year={3} // Pass year
+      approved={true} // Set this to true or false based on the user's approval status
       school="Cebu Institute of Technology - University" // Pass school
       bio="i love you"
     />
