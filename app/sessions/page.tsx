@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "./sidebar";
 import { Featured, SmallView } from "./studyhome";
+import { FloatingButton } from "./studyhome";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         <span className="font-bold text-2xl">RECENT</span>
         <SmallView type="ungart"></SmallView>
       </div>
+      <FloatingButton type="ungart"> </FloatingButton>
     </div>
   );
 }
