@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
 import { SideBar } from "./chats"
+
 export default function HomeLayout({
   children,
 }: Readonly<{
