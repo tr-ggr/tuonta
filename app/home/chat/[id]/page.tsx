@@ -1,9 +1,43 @@
 "use client"
-
+import useSWR from 'swr'
 import { faCircleXmark,faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useParams } from 'next/navigation'
 
 import Link from "next/link";
+
+type ProfileProps = {
+    username: string;
+    email: string;
+    birthday: string;
+    gender: string;
+    bio: string;
+    school: string;
+    course: string;
+    distance: number;
+    hobbies: string[];
+  };
+
+const fetcher = async (url: string) => {
+    const response = await fetch(url);
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        console.error("Error parsing JSON:", error);
+        console.error("Response text:", text);
+        throw error;
+    }
+};
+
+async function getProfile(userId: any){
+    const { data, error } = useSWR(`https://localhost:7113/api/profiles/${userId}`, fetcher);
+    return {
+      data: data ? data : '',
+      loading: !data && !error,
+      error
+    };
+};
 
 export const ProfileTagItem = ({children} : any) => {
     const colors = ["bg-red-300", "bg-blue-300", "bg-green-300", "bg-yellow-300", "bg-purple-300", "bg-pink-300", "bg-indigo-300", "bg-gray-300"];
@@ -14,32 +48,46 @@ export const ProfileTagItem = ({children} : any) => {
     );
 }
 
-export const ProfileTags = () => {
+export const ProfileTags = (data : any) => {
+    // const tags:string[] = data.data 
+
+    const tags: string[] = data.tags
+
+    console.log(tags)
+
+    if (!tags) {
+        return null; // or you can return a fallback UI
+    }
+
     return (
         <div className = "flex flex-col gap-2">
             <div className = "flex gap-2">
-                <ProfileTagItem>Mathematics</ProfileTagItem>
-                <ProfileTagItem>Algebra</ProfileTagItem>
+
+                 {tags.map((hobby : string, index : number) => (
+                <ProfileTagItem key={index}>{hobby}</ProfileTagItem>
+                ))}
             </div>
         </div>
     )
 }
 
-export const ProfileOverview = () => {
+export const ProfileOverview = (data: any) => {
+    const userData: ProfileProps = data.data;
+
     return (
         <div className = "w-1/2 h-full p-2 flex flex-col gap-4 border-l-2">
             <div className = "w-full h-1/2 bg-gray-300 rounded-lg"></div>
             <div className = "flex flex-col gap-1">
-                <span className = "text-2xl font-bold">Derrick</span>
-                <span className = "text-md">Cebu Institute of Technology</span>
-                <span className = "text-xs text-gray-500">BS Criminology, Major in Forensics</span>
+                <span className = "text-2xl font-bold">{userData.username}</span>
+                <span className = "text-md">{userData.school}</span>
+                <span className = "text-xs text-gray-500">{userData.course}</span>
 
             </div>
 
-            <ProfileTags></ProfileTags>
+            <ProfileTags tags={userData.hobbies}></ProfileTags>
 
             <div className = "flex-wrap break-all">
-                <span className = "text-gray-500 text-sm font-light ">habsdhasbdnhsandhadsmjasmaskdnasdsjkasdkasmdksaadnsajdnasjdnsajdndsjad</span>
+                <span className = "text-gray-500 text-sm font-light ">{userData.bio}</span>
             </div>
 
 
@@ -61,13 +109,22 @@ export const RightChat = ({children} : any) => {
 
 }
 
-export default async function ChatPage({ params }: any) {
+export default async function ChatPage() {
+    const params = useParams()
+    // console.log(params.id);
+    const data = await getProfile(params.id);
+    const chatMate: ProfileProps = data.data;
+
+
+
+    // console.log(chatMate)
+
     return (
         <div className = "flex w-full h-full max-h-full">
             {/* Chat Page */}
             <div className = "flex flex-col w-full h-full max-h-full">
                 <div className = "p-4 flex items-center w-full justify-between h-24 border-b-2">
-                    <span>Derrick Binangbang</span>
+                    <span>{chatMate.username}</span>
                     <Link href="/home"><FontAwesomeIcon icon={faCircleXmark} /></Link>
                 </div>
 
@@ -86,7 +143,7 @@ export default async function ChatPage({ params }: any) {
             
 
             {/* Profile Overview */}
-            <ProfileOverview></ProfileOverview>
+            <ProfileOverview data={chatMate}></ProfileOverview>
         </div>
     )
 }

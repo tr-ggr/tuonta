@@ -39,6 +39,7 @@ export const NavProfile = ({
   user: string;
 }) => {
   return (
+    <Link href={"/profile"}>
     <div className="flex items-center w-fit h-full gap-3">
       <div
         className="bg-white w-8 h-8 rounded-full"
@@ -50,6 +51,7 @@ export const NavProfile = ({
       ></div>
       <span className="text-[#fdfdfd] font-bold">{user}</span>
     </div>
+    </Link>
   );
 };
 
