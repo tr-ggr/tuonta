@@ -56,7 +56,8 @@ export const NavProfile = ({
 };
 
 export const Navbar = () => {
-  if (usePathname() === "/") return;
+  const pathname = usePathname();
+  if (pathname === "/" || pathname === "/login" || pathname === "/signup" ) return;
   return (
     <nav className="w-full h-16 p-8 items-center justify-between flex gap-6 bg-[#240046]">
       <div className="flex items-center gap-4">

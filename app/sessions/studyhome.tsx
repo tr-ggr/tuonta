@@ -152,7 +152,7 @@ export const FloatingButton = ({ type }: any) => {
   const [sessionTitle, setSessionTitle] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
   const [privacy, setPrivacy] = useState("public");
-  const [coverImage, setCoverImage] = useState("default-cover.jpg");
+  const [coverImage, setCoverImage] = useState("/images/banner/b1.jpg");
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -163,12 +163,12 @@ export const FloatingButton = ({ type }: any) => {
   };
 
   const coverImages = [
-    "default-cover.jpg",
-    "cover1.jpg",
-    "cover2.jpg",
-    "cover3.jpg",
-    "cover4.jpg",
-    "cover5.jpg",
+    "/images/banner/b2.jpg",
+    "/images/banner/b8.jpg",
+    "/images/banner/b4.jpg",
+    "/images/banner/b5.jpg",
+    "/images/banner/b6.jpg",
+    "/images/banner/b7.jpg",
   ];
 
   return (
@@ -188,7 +188,7 @@ export const FloatingButton = ({ type }: any) => {
           onClick={toggleModal} // Close modal when clicking outside
         >
           <div
-            className="bg-white p-8 rounded-lg shadow-lg w-2/3 max-h-[90vh] overflow-y-auto flex flex-col"
+            className="bg-white p-10 rounded-lg shadow-lg w-2/3 max-h-[90vh] overflow-y-auto flex flex-col"
             onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
           >
             {/* Change Study Session Cover */}
@@ -204,7 +204,7 @@ export const FloatingButton = ({ type }: any) => {
                     <img
                       src={image}
                       alt={`Cover ${index + 1}`}
-                      className={`w-full h-32 object-cover rounded-md ${
+                      className={`w-full h-20 object-cover rounded-md ${
                         coverImage === image ? "border-2 border-violet-600" : ""
                       }`}
                     />
@@ -213,7 +213,7 @@ export const FloatingButton = ({ type }: any) => {
               </div>
               {/* Display selected cover */}
               <div
-                className="w-full h-1 bg-cover rounded-md"
+                className="w-full h-56 bg-cover rounded-md"
                 style={{
                   backgroundImage: `url(${coverImage})`,
                   backgroundSize: "cover",
