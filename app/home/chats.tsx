@@ -32,7 +32,7 @@ const fetcher = async (url: string) => {
   }
 };
 
-const useUserName = (userId: number) => {
+const useUserName = (userId: number): { name: string; loading: boolean; error: any } => {
   const { data, error } = useSWR(`https://localhost:7113/api/profiles/${userId}`, fetcher);
   return {
     name: data ? data.username : '',
@@ -66,15 +66,11 @@ export const ChatItem = ({ chatId, senderId, message, timestamp }: ChatItemProps
 
 
 export const Chats = () => {
-  const { data, error } = useSWR('https://localhost:7113/api/chats/1', fetcher);
+  const { data, error } = useSWR('https://localhost:7113/api/chats/user_id/1', fetcher);
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
 
-  console.log(data);
-
   const chats: ChatProps[] = data;
-
-  console.log("CHATS LMAO", chats);
 
   const latestChatItems = chats.map(chat => {
     const latestItem = chat.chatItems.reduce((latest, item) => {
@@ -85,7 +81,7 @@ export const Chats = () => {
 
     return {
       chatId: chat.id, // Assuming chatId is user1Id, adjust if needed
-      senderId: latestItem.senderId,
+      senderId: chat.user2Id,
       message: latestItem.message,
       timestamp: latestItem.timestamp
     };
