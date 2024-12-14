@@ -12,6 +12,10 @@ import { useRouter } from 'next/navigation'
 
 import useSWR from 'swr'
 
+export const CurrentUser = {
+  id: "1",
+}
+
 const fetcher = (e : string) => fetch(e).then(res => res.json())
 
 function getAllProfiles(excludeUserId: string) {
@@ -125,7 +129,7 @@ export const MatchCard = ({ profile }: { profile: any }) => {
 }
 
 export default function HomePage() {
-  const excludeUserId = '1'; // Replace with the actual user ID to exclude
+  const excludeUserId = CurrentUser.id; // Replace with the actual user ID to exclude
   const { data: profiles, loading, error } = getAllProfiles(excludeUserId);
   const [currentIndex, setCurrentIndex] = useState(0);
 
