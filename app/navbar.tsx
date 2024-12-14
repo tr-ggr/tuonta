@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoAddCss = false;
-
-import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
+import SettingsPage from "./settings/page"; // Import the Settings modal
 
 export const NavButton = ({
   isActive,
@@ -40,45 +41,59 @@ export const NavProfile = ({
 }) => {
   return (
     <Link href={"/profile"}>
-    <div className="flex items-center w-fit h-full gap-3">
-      <div
-        className="bg-white w-8 h-8 rounded-full"
-        style={{
-          backgroundImage: `url(${picture})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      ></div>
-      <span className="text-[#fdfdfd] font-bold">{user}</span>
-    </div>
+      <div className="flex items-center w-fit h-full gap-3">
+        <div
+          className="bg-white w-8 h-8 rounded-full"
+          style={{
+            backgroundImage: `url(${picture})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
+        <span className="text-[#fdfdfd] font-bold">{user}</span>
+      </div>
     </Link>
   );
 };
 
 export const Navbar = () => {
   const pathname = usePathname();
-  if (pathname === "/" || pathname === "/login" || pathname === "/signup" ) return;
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  if (pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+
   return (
-    <nav className="w-full h-16 p-8 items-center justify-between flex gap-6 bg-[#240046]">
-      <div className="flex items-center gap-4">
-        <span className="text-3xl text-[#FDFDFD] font-bold">TuonTa</span>
+    <>
+      <nav className="w-full h-16 p-8 items-center justify-between flex gap-6 bg-[#240046]">
+        <div className="flex items-center gap-4">
+          <span className="text-3xl text-[#FDFDFD] font-bold">TuonTa</span>
 
-        {/* Navigation Links */}
-        <div className="flex gap-2">
-          <NavButton href="/home" isActive={usePathname() === "/home"}>
-            Find match!
-          </NavButton>
-          <NavButton href="/sessions" isActive={usePathname() === "/sessions"}>
-            Study Session
-          </NavButton>
+          {/* Navigation Links */}
+          <div className="flex gap-2">
+            <NavButton href="/home" isActive={pathname === "/home"}>
+              Find match!
+            </NavButton>
+            <NavButton href="/sessions" isActive={pathname === "/sessions"}>
+              Study Session
+            </NavButton>
+          </div>
         </div>
-      </div>
 
-      <div className="flex gap-4 items-center">
-        <NavProfile user="Jake Bajo" />
-        <FontAwesomeIcon icon={faBell} className="text-white" />
-        <FontAwesomeIcon icon={faGear} className="text-white" />
-      </div>
-    </nav>
+        <div className="flex gap-4 items-center">
+          <NavProfile user="Jake Bajo" />
+          <FontAwesomeIcon icon={faBell} className="text-white" />
+          <FontAwesomeIcon
+            icon={faGear}
+            className="text-white cursor-pointer"
+            onClick={() => setShowSettingsModal(true)}
+          />
+        </div>
+      </nav>
+
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <SettingsPage onClose={() => setShowSettingsModal(false)} />
+      )}
+    </>
   );
 };

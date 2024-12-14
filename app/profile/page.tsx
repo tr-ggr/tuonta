@@ -4,6 +4,8 @@ import { useState } from "react";
 import HobbiesModal from "./modals/hobbies"; // Import your modal component
 import ProfilePicsEdit from "./profilepicsedit"; // Import the ProfilePicsEdit component
 import ProfilePics from "./profilepics"; // Import the ProfilePics component
+import SaveChangesModal from "./modals/savechanges"; // Import the SaveChangesModal component
+
 
 export default function ProfileSettingsPage() {
   const [username, setUsername] = useState("jakebajo2003");
@@ -21,6 +23,7 @@ export default function ProfileSettingsPage() {
   const [isEditingProfilePics, setIsEditingProfilePics] = useState(false);
 
   const [showHobbiesModal, setShowHobbiesModal] = useState(false);
+  const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
 
   // State to control edit mode for the profile
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -40,8 +43,19 @@ export default function ProfileSettingsPage() {
   };
 
   const handleSaveChanges = () => {
-    alert("Changes saved!");
+    setIsEditingProfile(true); // Disable edit mode after saving
+    setShowSaveChangesModal(true); // Show the save changes confirmation modal
+  };
+
+  const handleCloseSaveChangesModal = () => {
+    setShowSaveChangesModal(false); // Close the save changes modal
+  };
+
+  const handleConfirmSaveChanges = () => {
+    // Add any additional logic you want when save is confirmed
+    setShowSaveChangesModal(false); // Close modal
     setIsEditingProfile(false); // Disable edit mode after saving
+
   };
 
   return (
@@ -219,6 +233,13 @@ export default function ProfileSettingsPage() {
         )}
       </div>
 
+        {/* Modal for Save Changes */}
+      {showSaveChangesModal && (
+        <SaveChangesModal 
+        onClose={handleCloseSaveChangesModal} 
+        onSave={handleConfirmSaveChanges} // Pass onSave prop to modal
+        />
+      )}
       {/* Modal */}
       {showHobbiesModal && (
         <HobbiesModal
