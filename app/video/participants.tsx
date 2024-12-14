@@ -1,20 +1,3 @@
-// export const Participants = () => {
-//     return (
-//       <div className="w-full p-4 bg-gray-600">
-//         <div className="grid grid-cols-4 gap-4">
-//           {[1, 2, 3, 4].map((id) => (
-//             <div
-//               key={id}
-//               className="w-full h-24 bg-gray-800 rounded-lg flex items-center justify-center"
-//             >
-//               {/* Participant name label */}
-//               <span className="text-white font-semibold">Participant {id}</span>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     );
-//   };
 
 
 
@@ -52,4 +35,48 @@ export const Participants = () => {
     );
   };
   
+
+
+//ADMIN VIEW
   
+//   import React from "react";
+// import { useAuth } from "./AuthContext";
+
+// export const Participants = () => {
+//   const { user } = useAuth(); // Access isAdmin flag
+
+//   const handleKick = (id) => {
+//     if (user.isAdmin) {
+//       console.log(`Kicking Participant ${id}`); // Placeholder for backend call
+//     } else {
+//       alert("Only admins can kick participants!");
+//     }
+//   };
+
+//   return (
+//     <div className="w-full p-4 bg-gray-600">
+//       <div className="grid grid-cols-4 gap-4">
+//         {[1, 2, 3, 4].map((id) => (
+//           <div
+//             key={id}
+//             className="w-full h-24 bg-gray-800 rounded-lg flex items-center justify-center relative"
+//           >
+//             <span className="text-white font-semibold z-10">
+//               Participant {id}
+//             </span>
+
+//             {/* Admin-only Kick Button */}
+//             {user.isAdmin && (
+//               <button
+//                 onClick={() => handleKick(id)}
+//                 className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
+//               >
+//                 Kick
+//               </button>
+//             )}
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
