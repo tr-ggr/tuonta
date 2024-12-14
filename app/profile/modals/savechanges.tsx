@@ -8,8 +8,8 @@ interface SaveChangesModalProps {
 const SaveChangesModal: React.FC<SaveChangesModalProps> = ({ onClose, onSave }) => {
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-        <h2 className="text-xl font-semibold mb-4">Are you sure you want to save changes?</h2>
+      <div className="bg-white p-6 rounded-lg shadow-lg w-80"> {/* Reduced width to 80 */}
+        <h2 className="text-xl font-semibold mb-4 text-center">Are you sure you want to save changes?</h2>
         <div className="flex space-x-4">
           <button
             onClick={onSave} // Trigger onSave when confirming save

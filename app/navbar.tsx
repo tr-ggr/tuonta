@@ -10,9 +10,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
 import SettingsPage from "./settings/page"; // Import the Settings modal
-
-import { useState } from "react";
-
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"

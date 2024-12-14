@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function SettingsPage({ onClose }: { onClose: () => void }) {
   const handleLogout = () => {
-    alert("Logged out!"); // Replace with your logout logic
+    //alert("Logged out!"); // Replace with your logout logic
     onClose(); // Close the modal after logout
   };
 
@@ -17,13 +17,13 @@ export default function SettingsPage({ onClose }: { onClose: () => void }) {
         <h1 className="text-2xl font-semibold mb-4 text-center">Settings</h1>
         <div className="flex flex-col items-center gap-4">
           <Button
-            className="w-full bg-red-500 text-white py-2 font-semibold rounded-md"
+            className="w-full bg-red-500 text-white py-2 font-semibold rounded-md hover:bg-red-600 h-11"
             onClick={handleLogout}
           >
-            Logout
+            Sign Out
           </Button>
           <Button
-            className="w-full bg-gray-300 text-black py-2 font-semibold rounded-md"
+            className="w-full bg-gray-300 text-black py-2 font-semibold rounded-md hover:bg-gray-400 h-11"
             onClick={onClose}
           >
             Close
