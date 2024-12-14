@@ -7,6 +7,8 @@ import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
 import { SideBar } from "./chats"
 
 
+
+
 export default function HomeLayout({
   children,
 }: Readonly<{
@@ -16,7 +18,6 @@ export default function HomeLayout({
   return (
 
   <div className = "flex flex-grow">
-
     <SideBar></SideBar>
     <section className = "w-full h-full">{children}</section>
   </div>);
