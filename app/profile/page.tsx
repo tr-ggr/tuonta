@@ -22,6 +22,9 @@ export default function ProfileSettingsPage() {
 
   const [showHobbiesModal, setShowHobbiesModal] = useState(false);
 
+  // State to control edit mode for the profile
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
   const handleSaveHobbies = (selectedHobbies: string[]) => {
     setHobbies(selectedHobbies);
     setShowHobbiesModal(false);
@@ -30,6 +33,15 @@ export default function ProfileSettingsPage() {
   const handleSaveProfilePics = (updatedImages: string[]) => {
     setProfileImages(updatedImages);
     setIsEditingProfilePics(false); // Return to ProfilePics after saving
+  };
+
+  const handleEditProfile = () => {
+    setIsEditingProfile(true); // Enable edit mode
+  };
+
+  const handleSaveChanges = () => {
+    alert("Changes saved!");
+    setIsEditingProfile(false); // Disable edit mode after saving
   };
 
   return (
@@ -47,6 +59,7 @@ export default function ProfileSettingsPage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={!isEditingProfile}
                 className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
               />
             </div>
@@ -56,6 +69,7 @@ export default function ProfileSettingsPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={!isEditingProfile}
                 className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
               />
             </div>
@@ -65,6 +79,7 @@ export default function ProfileSettingsPage() {
                 type="date"
                 value={birthday}
                 onChange={(e) => setBirthday(e.target.value)}
+                disabled={!isEditingProfile}
                 className="text-right bg-transparent focus:outline-none rounded-md p-2 mt-5"
               />
             </div>
@@ -73,6 +88,7 @@ export default function ProfileSettingsPage() {
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
+                disabled={!isEditingProfile}
                 className="bg-transparent focus:outline-none text-right rounded-md p-2 mt-5"
               >
                 <option>Male</option>
@@ -86,6 +102,7 @@ export default function ProfileSettingsPage() {
                 type="text"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
+                disabled={!isEditingProfile}
                 className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
               />
             </div>
@@ -98,7 +115,8 @@ export default function ProfileSettingsPage() {
             <label className="text-sm font-bold mb-1">Hobbies</label>
             <button
               onClick={() => setShowHobbiesModal(true)}
-              className="bg-[#4530a7] text-white py-2 px-4 font-semibold text-sm rounded-md"
+              disabled={!isEditingProfile}
+              className="bg-[#4530a7] text-white py-2 px-4 font-semibold text-sm rounded-md disabled:opacity-50"
             >
               Add Hobby
             </button>
@@ -125,6 +143,7 @@ export default function ProfileSettingsPage() {
                 type="text"
                 value={school}
                 onChange={(e) => setSchool(e.target.value)}
+                disabled={!isEditingProfile}
                 className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
               />
             </div>
@@ -134,6 +153,7 @@ export default function ProfileSettingsPage() {
                 type="text"
                 value={course}
                 onChange={(e) => setCourse(e.target.value)}
+                disabled={!isEditingProfile}
                 className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
               />
             </div>
@@ -150,43 +170,54 @@ export default function ProfileSettingsPage() {
               max="100"
               value={distance}
               onChange={(e) => setDistance(Number(e.target.value))}
+              disabled={!isEditingProfile}
               className="w-full accent-[#4530a7] mt-5"
             />
             <div className="text-right">{distance} km</div>
           </div>
         </section>
 
-        {/* Save Button */}
+        {/* Edit/Save Button */}
         <div className="mt-6">
-          <button
-            onClick={() => alert("Changes saved!")}
-            className="w-full bg-[#4530a7] text-white py-3 font-semibold text-lg rounded-full"
-          >
-            Save Changes
-          </button>
+          {!isEditingProfile ? (
+            <button
+              onClick={handleEditProfile}
+              className="w-full bg-[#4530a7] text-white py-3 font-semibold text-lg rounded-full"
+            >
+              Edit Profile
+            </button>
+          ) : (
+            <button
+              onClick={handleSaveChanges}
+              className="w-full bg-[#4530a7] text-white py-3 font-semibold text-lg rounded-full"
+            >
+              Save Changes
+            </button>
+          )}
         </div>
       </div>
-{/* Profile Pics Section */}
-<div className="w-full max-w-3xl flex justify-center items-center p-4">
-  {isEditingProfilePics ? (
-    <ProfilePicsEdit
-      initialImages={profileImages}
-      onSaveChanges={handleSaveProfilePics}
-    />
-  ) : (
-    <ProfilePics
-      images={profileImages}
-      onEdit={() => setIsEditingProfilePics(true)} // Show ProfilePicsEdit when editing
-      name="Jake Bajo" // Pass name
-      birthday="2002-01-01" // Pass birthday
-      course="BSCS" // Pass course
-      year={3} // Pass year
-      approved={true} // Set this to true or false based on the user's approval status
-      school="Cebu Institute of Technology - University" // Pass school
-      bio="i love you"
-    />
-  )}
-</div>
+
+      {/* Profile Pics Section */}
+      <div className="w-full max-w-3xl flex justify-center items-center p-4">
+        {isEditingProfilePics ? (
+          <ProfilePicsEdit
+            initialImages={profileImages}
+            onSaveChanges={handleSaveProfilePics}
+          />
+        ) : (
+          <ProfilePics
+            images={profileImages}
+            onEdit={() => setIsEditingProfilePics(true)} // Show ProfilePicsEdit when editing
+            name="Jake Bajo" // Pass name
+            birthday="2002-01-01" // Pass birthday
+            course="BSCS" // Pass course
+            year={3} // Pass year
+            approved={true} // Set this to true or false based on the user's approval status
+            school="Cebu Institute of Technology - University" // Pass school
+            bio="i love you"
+          />
+        )}
+      </div>
 
       {/* Modal */}
       {showHobbiesModal && (
