@@ -45,7 +45,7 @@ const UserManagement: React.FC = () => {
         if (users && users.length > 0) {
           const profiles = await Promise.all(
             users.map(async (user) => {
-              const res = await fetch(`https://localhost:7113/api/profiles/${user.id}`);
+              const res = await fetch(`https://localhost:7113/api/profiles/${user.userID}`);
               const profileData = await res.json();
               return profileData;
             })
@@ -78,6 +78,8 @@ const UserManagement: React.FC = () => {
     setModalVisible(false);
     setModalUser(null);
   };
+
+  console.log(profileDetails)
 
   return (
     <div className="flex-1 p-8 overflow-y-auto">
