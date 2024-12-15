@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import React from "react";
 
+
 export default function signup(){
 
     const [formData, setFormData] = useState({
@@ -135,6 +136,7 @@ export default function signup(){
                     <Link href = "/login">
                         <span className="font-bold text-indigo-900 hover:text-blue-800 hover:underline">Sign in</span>
                     </Link>
+
                 </div>
             </div>
         </div>

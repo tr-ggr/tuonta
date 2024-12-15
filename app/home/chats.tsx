@@ -4,9 +4,12 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import useSWR from 'swr'
 
+import { CurrentUser } from "./page"; 
+
 type ChatItemProps = {
   chatId: number;
-  senderId: number;
+  user1Id: number;
+  user2Id: number;
   message: string;
   timestamp: string;
 };
@@ -32,7 +35,7 @@ const fetcher = async (url: string) => {
   }
 };
 
-const useUserName = (userId: number) => {
+const useUserName = (userId: number): { name: string; loading: boolean; error: any } => {
   const { data, error } = useSWR(`https://localhost:7113/api/profiles/${userId}`, fetcher);
   return {
     name: data ? data.username : '',
@@ -41,9 +44,10 @@ const useUserName = (userId: number) => {
   };
 };
 
-export const ChatItem = ({ chatId, senderId, message, timestamp }: ChatItemProps) => {
-  const { name, loading, error } = useUserName(senderId);
+export const ChatItem = ({ chatId, user1Id, user2Id, message, timestamp }: ChatItemProps) => {
+  const { name, loading, error } = useUserName(Number(CurrentUser.id) == user1Id ? user2Id : user1Id);
 
+  console.log(user2Id)
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Failed to load user name</div>;
 
@@ -66,15 +70,11 @@ export const ChatItem = ({ chatId, senderId, message, timestamp }: ChatItemProps
 
 
 export const Chats = () => {
-  const { data, error } = useSWR('https://localhost:7113/api/chats/1', fetcher);
+  const { data, error } = useSWR(`https://localhost:7113/api/chats/user_id/${CurrentUser.id}`, fetcher);
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
 
-  console.log(data);
-
   const chats: ChatProps[] = data;
-
-  console.log("CHATS LMAO", chats);
 
   const latestChatItems = chats.map(chat => {
     const latestItem = chat.chatItems.reduce((latest, item) => {
@@ -84,8 +84,9 @@ export const Chats = () => {
     
 
     return {
-      chatId: chat.id, // Assuming chatId is user1Id, adjust if needed
-      senderId: latestItem.senderId,
+      chatId: chat.id, 
+      user1Id: chat.user1Id,
+      user2Id: chat.user2Id,
       message: latestItem.message,
       timestamp: latestItem.timestamp
     };
@@ -94,7 +95,7 @@ export const Chats = () => {
   return (
     <div className="flex flex-col gap-4">
       {latestChatItems.map((item: ChatItemProps) => (
-        <ChatItem key={item.chatId} chatId={item.chatId} senderId={item.senderId} message={item.message} timestamp={item.timestamp} />
+        <ChatItem key={item.chatId} chatId={item.chatId} user1Id={item.user1Id} user2Id={item.user2Id} message={item.message} timestamp={item.timestamp} />
       ))}
     </div>
   );

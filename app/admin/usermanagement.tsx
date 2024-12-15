@@ -13,13 +13,13 @@ interface User {
   profilePics: string[];
   approved: boolean;
   selectedImageIndex: number;
+  createdAt: string;  // Added field for date of creation
 }
 
 const usersPerPage = 6;
 
 const UserManagement: React.FC = () => {
-    // Adding 8 users with 6 manually selected profile images (1.png to 6.png)
-    const [users, setUsers] = useState<User[]>([
+  const [users, setUsers] = useState<User[]>([
       {
         id: 1,
         name: "Alice Johnson",
@@ -30,158 +30,193 @@ const UserManagement: React.FC = () => {
         school: "CIT-U",
         gender: "Female",
         profilePics: [
-          "/images/1.png",
           "/images/2.png",
-          "/images/3.png",
-          "/images/4.png",
           "/images/5.png",
+          "/images/3.png",
+          "/images/1.png",
           "/images/6.png",
+          "/images/4.png",
         ],
         approved: false,
         selectedImageIndex: 0,
+        createdAt: "2023-01-15T08:00:00Z",
       },
       {
         id: 2,
-        name: "Bob Smith",
-        email: "bob.smith@example.com",
-        birthday: "1997-11-15",
+        name: "John Smith",
+        email: "john.smith@example.com",
+        birthday: "1999-12-15",
         course: "BS Information Technology",
         year: 4,
         school: "CIT-U",
         gender: "Male",
         profilePics: [
-          "/images/1.png",
-          "/images/2.png",
-          "/images/3.png",
           "/images/4.png",
-          "/images/5.png",
+          "/images/1.png",
           "/images/6.png",
+          "/images/3.png",
+          "/images/2.png",
+          "/images/5.png",
         ],
         approved: true,
-        selectedImageIndex: 1,
+        selectedImageIndex: 0,
+        createdAt: "2023-02-20T10:30:00Z",
       },
       {
         id: 3,
-        name: "Charlie Davis",
-        email: "charlie.davis@example.com",
-        birthday: "1999-03-12",
-        course: "BS Software Engineering",
+        name: "Maria Garcia",
+        email: "maria.garcia@example.com",
+        birthday: "2000-03-10",
+        course: "BS Nursing",
         year: 2,
-        school: "CIT-U",
-        gender: "Male",
+        school: "Cebu Doctors' University",
+        gender: "Female",
         profilePics: [
-          "/images/1.png",
-          "/images/2.png",
           "/images/3.png",
-          "/images/4.png",
           "/images/5.png",
+          "/images/4.png",
+          "/images/2.png",
           "/images/6.png",
+          "/images/1.png",
         ],
         approved: false,
-        selectedImageIndex: 2,
+        selectedImageIndex: 1,
+        createdAt: "2023-03-05T09:15:00Z",
       },
       {
         id: 4,
-        name: "Diana Lewis",
-        email: "diana.lewis@example.com",
-        birthday: "2000-08-30",
-        course: "BS Information Systems",
+        name: "James Brown",
+        email: "james.brown@example.com",
+        birthday: "1997-07-22",
+        course: "BS Civil Engineering",
+        year: 5,
+        school: "University of San Carlos",
+        gender: "Male",
+        profilePics: [
+          "/images/6.png",
+          "/images/2.png",
+          "/images/5.png",
+          "/images/3.png",
+          "/images/1.png",
+          "/images/4.png",
+        ],
+        approved: true,
+        selectedImageIndex: 2,
+        createdAt: "2023-04-10T11:45:00Z",
+      },
+      {
+        id: 5,
+        name: "Sophia Davis",
+        email: "sophia.davis@example.com",
+        birthday: "2001-11-05",
+        course: "BS Architecture",
         year: 1,
         school: "CIT-U",
         gender: "Female",
         profilePics: [
           "/images/1.png",
-          "/images/2.png",
-          "/images/3.png",
+          "/images/6.png",
           "/images/4.png",
           "/images/5.png",
-          "/images/6.png",
-        ],
-        approved: true,
-        selectedImageIndex: 3,
-      },
-      {
-        id: 5,
-        name: "Ethan Brown",
-        email: "ethan.brown@example.com",
-        birthday: "1996-12-25",
-        course: "BS Computer Engineering",
-        year: 4,
-        school: "CIT-U",
-        gender: "Male",
-        profilePics: [
-          "/images/1.png",
-          "/images/2.png",
           "/images/3.png",
-          "/images/4.png",
-          "/images/5.png",
-          "/images/6.png",
+          "/images/2.png",
         ],
-        approved: true,
-        selectedImageIndex: 4,
+        approved: false,
+        selectedImageIndex: 0,
+        createdAt: "2023-05-25T14:00:00Z",
       },
       {
         id: 6,
-        name: "Fiona White",
-        email: "fiona.white@example.com",
-        birthday: "1998-02-18",
-        course: "BS Data Science",
+        name: "Liam Martinez",
+        email: "liam.martinez@example.com",
+        birthday: "2000-09-18",
+        course: "BS Mechanical Engineering",
+        year: 4,
+        school: "University of the Visayas",
+        gender: "Male",
+        profilePics: [
+          "/images/5.png",
+          "/images/4.png",
+          "/images/1.png",
+          "/images/3.png",
+          "/images/6.png",
+          "/images/2.png",
+        ],
+        approved: true,
+        selectedImageIndex: 1,
+        createdAt: "2023-06-12T16:20:00Z",
+      },
+      {
+        id: 7,
+        name: "Isabella Wilson",
+        email: "isabella.wilson@example.com",
+        birthday: "2002-02-14",
+        course: "BS Accountancy",
+        year: 2,
+        school: "Cebu Normal University",
+        gender: "Female",
+        profilePics: [
+          "/images/4.png",
+          "/images/2.png",
+          "/images/6.png",
+          "/images/5.png",
+          "/images/1.png",
+          "/images/3.png",
+        ],
+        approved: false,
+        selectedImageIndex: 2,
+        createdAt: "2023-07-05T08:10:00Z",
+      },
+      {
+        id: 8,
+        name: "Ethan Hernandez",
+        email: "ethan.hernandez@example.com",
+        birthday: "1998-04-09",
+        course: "BS Electronics Engineering",
+        year: 5,
+        school: "University of Cebu",
+        gender: "Male",
+        profilePics: [
+          "/images/6.png",
+          "/images/3.png",
+          "/images/5.png",
+          "/images/2.png",
+          "/images/4.png",
+          "/images/1.png",
+        ],
+        approved: true,
+        selectedImageIndex: 0,
+        createdAt: "2023-08-01T12:30:00Z",
+      },
+      {
+        id: 9,
+        name: "Emma Thompson",
+        email: "emma.thompson@example.com",
+        birthday: "1999-06-30",
+        course: "BS Education",
         year: 3,
         school: "CIT-U",
         gender: "Female",
         profilePics: [
+          "/images/3.png",
           "/images/1.png",
           "/images/2.png",
-          "/images/3.png",
           "/images/4.png",
-          "/images/5.png",
           "/images/6.png",
+          "/images/5.png",
         ],
         approved: false,
-        selectedImageIndex: 5,
-      },
-      {
-        id: 7,
-        name: "George King",
-        email: "george.king@example.com",
-        birthday: "1997-07-10",
-        course: "BS Computer Science",
-        year: 4,
-        school: "CIT-U",
-        gender: "Male",
-        profilePics: [
-          "/images/1.png",
-          "/images/2.png",
-          "/images/3.png",
-          "/images/4.png",
-          "/images/5.png",
-          "/images/6.png",
-        ],
-        approved: false,
-        selectedImageIndex: 0,
-      },
-      {
-        id: 8,
-        name: "Hannah Scott",
-        email: "hannah.scott@example.com",
-        birthday: "2001-01-03",
-        course: "BS Software Engineering",
-        year: 1,
-        school: "CIT-U",
-        gender: "Female",
-        profilePics: [
-          "/images/1.png",
-          "/images/2.png",
-          "/images/3.png",
-          "/images/4.png",
-          "/images/5.png",
-          "/images/6.png",
-        ],
-        approved: true,
-        selectedImageIndex: 2,
-      },
-    ]);
+        selectedImageIndex: 1,
+        createdAt: "2023-09-10T15:40:00Z",
+      },    
+  ]);
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchBy, setSearchBy] = useState<"name" | "school" | "course">("name");
+  const [sortCriteria, setSortCriteria] = useState<"year" | "birthday" | "createdAt">("year");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
   const totalPages = Math.ceil(users.length / usersPerPage);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -226,7 +261,38 @@ const UserManagement: React.FC = () => {
     );
   };
 
-  const paginatedUsers = users.slice(
+  const handleSort = (criteria: "year" | "birthday" | "createdAt") => {
+    const direction = sortCriteria === criteria && sortDirection === "asc" ? "desc" : "asc";
+    setSortCriteria(criteria);
+    setSortDirection(direction);
+  };
+
+  const filteredUsers = users.filter((user) => {
+    const query = searchQuery.toLowerCase();
+    if (searchBy === "name") {
+      return user.name.toLowerCase().includes(query);
+    }
+    if (searchBy === "school") {
+      return user.school.toLowerCase().includes(query);
+    }
+    return user.course.toLowerCase().includes(query);
+  });
+
+  const sortedUsers = filteredUsers.sort((a, b) => {
+    let comparison = 0;
+
+    if (sortCriteria === "year") {
+      comparison = a.year - b.year;
+    } else if (sortCriteria === "birthday") {
+      comparison = new Date(a.birthday).getTime() - new Date(b.birthday).getTime();
+    } else if (sortCriteria === "createdAt") {
+      comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    }
+
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
+
+  const paginatedUsers = sortedUsers.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
@@ -246,6 +312,49 @@ const UserManagement: React.FC = () => {
   return (
     <div className="flex-1 p-8 overflow-y-auto">
       <h1 className="text-3xl font-semibold text-center mb-6">User Management</h1>
+
+      {/* Search Bar with Dropdown */}
+      <div className="mb-6 flex justify-center items-center gap-4">
+        <select
+          value={searchBy}
+          onChange={(e) => setSearchBy(e.target.value as "name" | "school" | "course")}
+          className="px-4 py-2 rounded-md border border-gray-300"
+        >
+          <option value="name">Search by Name</option>
+          <option value="school">Search by School</option>
+          <option value="course">Search by Course</option>
+        </select>
+        <input
+          type="text"
+          placeholder={`Search by ${searchBy.charAt(0).toUpperCase() + searchBy.slice(1)}`}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="px-4 py-2 rounded-md border border-gray-300 w-1/2"
+        />
+      </div>
+
+      {/* Sorting Options */}
+      <div className="mb-4 flex justify-center gap-4">
+        <button
+          onClick={() => handleSort("year")}
+          className="bg-[#4530a7] text-white px-4 py-2 rounded-md"
+        >
+          Sort by Year
+        </button>
+        <button
+          onClick={() => handleSort("birthday")}
+          className="bg-[#4530a7] text-white px-4 py-2 rounded-md"
+        >
+          Sort by Birthday
+        </button>
+        <button
+          onClick={() => handleSort("createdAt")}
+          className="bg-[#4530a7] text-white px-4 py-2 rounded-md"
+        >
+          Sort by Date of Creation
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {paginatedUsers.map((user) => (
           <div
@@ -267,20 +376,19 @@ const UserManagement: React.FC = () => {
                 </div>
               )}
               <div className="absolute top-1/2 left-0 right-0 flex justify-between px-4">
-  <button
-    onClick={() => handleImageChange(user.id, "prev")}
-    className="font-bold text-xl"
-  >
-    <img src="/images/arrowsleft.png" alt="Previous"/>
-  </button>
-  <button
-    onClick={() => handleImageChange(user.id, "next")}
-    className="font-bold text-xl"
-  >
-    <img src="/images/arrowsright.png" alt="Next" />
-  </button>
-</div>
-
+                <button
+                  onClick={() => handleImageChange(user.id, "prev")}
+                  className="font-bold text-xl"
+                >
+                  <img src="/images/arrowsleft.png" alt="Previous" />
+                </button>
+                <button
+                  onClick={() => handleImageChange(user.id, "next")}
+                  className="font-bold text-xl"
+                >
+                  <img src="/images/arrowsright.png" alt="Next" />
+                </button>
+              </div>
             </div>
             <h2 className="text-xl font-bold mt-2 text-center">{user.name}</h2>
             <div className="mt-2 space-y-1 text-md text-center">

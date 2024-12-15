@@ -1,7 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Link from 'next/link';
+
 import React from "react";
+
 
 export default function landing(){
     return(
@@ -14,6 +16,7 @@ export default function landing(){
                     </Link>
                     <Link href = "/signup">
                         <button type="button" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-medium rounded-full text-sm w-36 h-11 flex items-center justify-center">
+
                         <span className="flex items-center space-x-3">
                             <span>Get Started</span>
                             <FontAwesomeIcon icon={faArrowRight} />
@@ -33,6 +36,7 @@ export default function landing(){
                     <div>
                         <Link href = "/signup">
                             <button type="button" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-medium rounded-full text-sm w-44 h-11 flex items-center justify-center">
+
                             <span className="flex items-center space-x-3">
                                 <span>Get started for free</span>
                                 <FontAwesomeIcon icon={faArrowRight} />

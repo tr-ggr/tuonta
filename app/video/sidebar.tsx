@@ -58,7 +58,7 @@ export default function SideBar() {
               placeholder="Type a message"
               className="w-full p-2 bg-gray-700 rounded-lg text-white placeholder-gray-400"
             />
-            <button className="ml-2 text-white bg-blue-600 p-2 rounded-lg">Send</button>
+            <button className="ml-2 text-white bg-[#4530A7] p-2 rounded-lg">Send</button>
           </div>
         </div>
       )}
