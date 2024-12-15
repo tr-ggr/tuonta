@@ -13,11 +13,38 @@ import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 import { profile } from "console";
 
-export const CurrentUser = {
-  id: "1",
-}
+
 
 const fetcher = (e : string) => fetch(e).then(res => res.json())
+
+
+function getProfile(id: any){
+  const { data, error } = useSWR(`https://localhost:7113/api/profiles/${id}`, fetcher);
+  // console.log(data)
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+};
+
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? match[2] : null;
+};
+
+const destroyCookie = (name: string) => {
+  document.cookie = `${name}=; path=/; max-age=0;`;
+};
+
+const getProfileSession = () => {
+  return getProfile(getCookie("userId")).data
+}
+
+export const CurrentUser = {
+  id: getCookie("userId"),
+}
+
 
 
 const createNotification = async (notification: { userId: number; title: string; message: string, referenceId : string, type : string }) => {
@@ -130,7 +157,7 @@ export const AcceptButton = ({ userId, onClick, isDisabled }: { isDisabled : boo
     }
 
     onClick();
-    createNotification({ userId: Number(userId), title: "You have a new match!", message: "You have a new match!", referenceId: CurrentUser.id, type : "home" });
+    createNotification({ userId: Number(userId), title: "You have a new match!", message: "You have a new match!", referenceId: String(CurrentUser.id), type : "home" });
     // router.refresh();
   };
 
@@ -165,7 +192,7 @@ export const MatchCard = ({ profile }: { profile: any }) => {
 
 export default function HomePage() {
   const excludeUserId = CurrentUser.id; // Replace with the actual user ID to exclude
-  const { data: profiles, loading, error } = getAllProfiles(excludeUserId);
+  const { data: profiles, loading, error } = getAllProfiles(String(excludeUserId));
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (loading) return <div>Loading...</div>;

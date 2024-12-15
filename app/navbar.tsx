@@ -13,7 +13,7 @@ import SettingsPage from "./settings/page"; // Import the Settings modal
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import useSWR from 'swr';
-import { CurrentUser } from "./home/page";
+import { currentUser } from "./login/page";
 
 import {
   Card,
@@ -47,6 +47,15 @@ interface NotificationItemProps {
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
+function getProfile(id: any){
+  const { data, error } = useSWR(`https://localhost:7113/api/profiles/${id}`, fetcher);
+  // console.log(data)
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+};
 
 export const NavButton = ({
   isActive,
@@ -76,6 +85,8 @@ export const NavProfile = ({
   picture?: string;
   user: string;
 }) => {
+
+  console.log(user)
   return (
     <Link href={"/profile"}>
       <div className="flex items-center w-fit h-full gap-3">
@@ -99,6 +110,19 @@ export const NotificationFilter = ({children, isActive, onClick} : {onClick : ()
   } else {
     return <button onClick={onClick} className="bg-transparent text-sm">{children}</button>
   }
+}
+
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? match[2] : null;
+};
+
+const destroyCookie = (name: string) => {
+  document.cookie = `${name}=; path=/; max-age=0;`;
+};
+
+const getProfileSession = () => {
+  return getProfile(getCookie("userId")).data
 }
 
 
@@ -139,7 +163,7 @@ export const NotificationView = () => {
 
   useEffect(() => {
     if (notifications) {
-      const currentUserId = Number(CurrentUser.id);
+      const currentUserId = Number(currentUser.id);
       const filtered = notifications.filter((notification: NotificationItemProps) => {
         if (view === "all") return notification.userId === currentUserId;
         if (view === "match") return notification.userId === currentUserId && notification.type === "home";
@@ -199,7 +223,7 @@ export const Navbar = () => {
         </div>
 
         <div className="flex gap-4 items-center">
-          <NavProfile user="Jake Bajo" />
+          <NavProfile user={getProfileSession().username} />
           
         <Popover>
           <PopoverTrigger><FontAwesomeIcon icon={faBell} className="text-white" /></PopoverTrigger>

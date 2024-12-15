@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 
 export default function SettingsPage({ onClose }: { onClose: () => void }) {
   const handleLogout = () => {
-    //alert("Logged out!"); // Replace with your logout logic
+    document.cookie = `userId=; path=/; max-age=0;`;
+    window.location.href = "/"
     onClose(); // Close the modal after logout
   };
 
