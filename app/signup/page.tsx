@@ -1,6 +1,8 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import React from "react";
+
 
 export default function signup(){
 
@@ -51,7 +53,7 @@ export default function signup(){
             <div className="flex w-full justify-center">
                 <div className="bg-[url('/images/TuonTaLOGO.png')] bg-cover bg-center bg-no-repeat w-3/5 h-24"></div>
             </div>
-            <div className="flex-col flex-wrap content-center bg-fuchsia-100 h-4/6 space-y-5 px-10 rounded-3xl">
+            <div className="flex-col flex-wrap content-center bg-fuchsia-100 h-4/6 space-y-5 px-10 rounded-3xl drop-shadow-lg">
                 <div className="text-4xl font-bold text-indigo-950">Create an account</div>
                 <div>Please enter your details</div>
                 <form className = "flex-col flex-wrap content-center justify-center space-y-5" onSubmit={handleSubmit}>
@@ -119,7 +121,7 @@ export default function signup(){
 
                     <div>
                         <Link href = "/signup">
-                            <button type="submit" className="text-white bg-indigo-900 hover:bg-blue-800 font-bold rounded-full text-lg w-full h-11 flex items-center justify-center">
+                            <button type="submit" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-bold rounded-full text-lg w-full h-11 flex items-center justify-center">
                             <span className="flex items-center space-x-3">
                                 <span>Create account</span>
                             </span>
@@ -130,7 +132,11 @@ export default function signup(){
 
             
                 <div className="flex justify-center space-x-2">
-                    <span>Already have an account? </span> <span className="font-bold text-indigo-900 hover:text-blue-800 hover:underline">Sign in</span>
+                    <span>Already have an account? </span> 
+                    <Link href = "/login">
+                        <span className="font-bold text-indigo-900 hover:text-blue-800 hover:underline">Sign in</span>
+                    </Link>
+
                 </div>
             </div>
         </div>

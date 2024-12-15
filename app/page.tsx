@@ -2,6 +2,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Link from 'next/link';
 
+import React from "react";
+
+
 export default function landing(){
     return(
         <div className="overflow-y-hidden">
@@ -12,7 +15,8 @@ export default function landing(){
                         <div className="pr-5 hover:text-blue-800 hover:underline">Sign in</div>
                     </Link>
                     <Link href = "/signup">
-                        <button type="button" className="text-white bg-indigo-900 hover:bg-blue-800 font-medium rounded-full text-sm w-36 h-11 flex items-center justify-center">
+                        <button type="button" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-medium rounded-full text-sm w-36 h-11 flex items-center justify-center">
+
                         <span className="flex items-center space-x-3">
                             <span>Get Started</span>
                             <FontAwesomeIcon icon={faArrowRight} />
@@ -31,7 +35,8 @@ export default function landing(){
                     <p>Swipe to connect with like-minded learners. Ace your goals together!</p>
                     <div>
                         <Link href = "/signup">
-                            <button type="button" className="text-white bg-indigo-900 hover:bg-blue-800 font-medium rounded-full text-sm w-44 h-11 flex items-center justify-center">
+                            <button type="button" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-medium rounded-full text-sm w-44 h-11 flex items-center justify-center">
+
                             <span className="flex items-center space-x-3">
                                 <span>Get started for free</span>
                                 <FontAwesomeIcon icon={faArrowRight} />
