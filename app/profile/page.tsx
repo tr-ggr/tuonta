@@ -1,31 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import HobbiesModal from "./modals/hobbies"; // Import your modal component
-import ProfilePicsEdit from "./profilepicsedit"; // Import the ProfilePicsEdit component
-import ProfilePics from "./profilepics"; // Import the ProfilePics component
-import SaveChangesModal from "./modals/savechanges"; // Import the SaveChangesModal component
+import { useState, useEffect } from "react";
+import HobbiesModal from "./modals/hobbies";
+import ProfilePicsEdit from "./profilepicsedit";
+import ProfilePics from "./profilepics";
+import SaveChangesModal from "./modals/savechanges";
 
+interface ProfileSettingsPageProps {
+  initialData: {
+    username: string;
+    email: string;
+    birthday: string;
+    gender: string;
+    bio: string;
+    school: string;
+    course: string;
+    distance: number;
+    hobbies: string[];
+    profileImages: string[];
+  };
+  onSaveProfile: (updatedProfile: any) => void;
+}
 
-export default function ProfileSettingsPage() {
-  const [username, setUsername] = useState("jakebajo2003");
-  const [email, setEmail] = useState("jakebajo2003@gmail.com");
-  const [birthday, setBirthday] = useState("10/04/2003");
-  const [gender, setGender] = useState("Male");
-  const [bio, setBio] = useState("i love you");
-  const [school, setSchool] = useState("Cebu Institute of Technology - University");
-  const [course, setCourse] = useState("BSCS - 3");
-  const [distance, setDistance] = useState(30);
-  const [hobbies, setHobbies] = useState<string[]>([]);
-  const [profileImages, setProfileImages] = useState<string[]>(new Array(6).fill(""));
+export default function ProfileSettingsPage({
+  initialData,
+  onSaveProfile,
+}: ProfileSettingsPageProps) {
+  const [username, setUsername] = useState(initialData.username);
+  const [email, setEmail] = useState(initialData.email);
+  const [birthday, setBirthday] = useState(initialData.birthday);
+  const [gender, setGender] = useState(initialData.gender);
+  const [bio, setBio] = useState(initialData.bio);
+  const [school, setSchool] = useState(initialData.school);
+  const [course, setCourse] = useState(initialData.course);
+  const [distance, setDistance] = useState(initialData.distance);
+  const [hobbies, setHobbies] = useState<string[]>(initialData.hobbies);
+  const [profileImages, setProfileImages] = useState<string[]>(initialData.profileImages);
 
-  // State to control whether ProfilePics or ProfilePicsEdit is shown
   const [isEditingProfilePics, setIsEditingProfilePics] = useState(false);
-
   const [showHobbiesModal, setShowHobbiesModal] = useState(false);
   const [showSaveChangesModal, setShowSaveChangesModal] = useState(false);
-
-  // State to control edit mode for the profile
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const handleSaveHobbies = (selectedHobbies: string[]) => {
@@ -35,106 +49,154 @@ export default function ProfileSettingsPage() {
 
   const handleSaveProfilePics = (updatedImages: string[]) => {
     setProfileImages(updatedImages);
-    setIsEditingProfilePics(false); // Return to ProfilePics after saving
+    setIsEditingProfilePics(false);
   };
 
   const handleEditProfile = () => {
-    setIsEditingProfile(true); // Enable edit mode
+    setIsEditingProfile(true);
   };
 
   const handleSaveChanges = () => {
-    setIsEditingProfile(true); // Disable edit mode after saving
-    setShowSaveChangesModal(true); // Show the save changes confirmation modal
+    setIsEditingProfile(false);
+    setShowSaveChangesModal(true);
   };
 
   const handleCloseSaveChangesModal = () => {
-    setShowSaveChangesModal(false); // Close the save changes modal
+    setShowSaveChangesModal(false);
   };
 
   const handleConfirmSaveChanges = () => {
-    // Add any additional logic you want when save is confirmed
-    setShowSaveChangesModal(false); // Close modal
-    setIsEditingProfile(false); // Disable edit mode after saving
-
+    onSaveProfile({
+      username,
+      email,
+      birthday,
+      gender,
+      bio,
+      school,
+      course,
+      distance,
+      hobbies,
+      profileImages,
+    });
+    setShowSaveChangesModal(false);
+    setIsEditingProfile(false);
   };
 
   return (
     <div className="h-screen bg-gray-200 flex overflow-hidden">
-      {/* Profile Settings Section */}
       <div className="w-full max-w-3xl overflow-y-auto bg-[#f2e1fc] p-6 border border-gray-300 rounded-lg">
         <h1 className="text-2xl font-semibold mb-4 text-center">Profile Settings</h1>
 
-        {/* Personal Details Section */}
+        {/* Profile Settings Form */}
         <section>
-          <div className="">
-            <div className="flex flex-col bg-gray-100 p-2 border-b rounded-t-lg">
-              <label className="text-sm font-bold mb-1">Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={!isEditingProfile}
-                className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
-              />
-            </div>
-            <div className="flex flex-col bg-gray-100 p-2 border-b">
-              <label className="text-sm font-bold mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={!isEditingProfile}
-                className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
-              />
-            </div>
-            <div className="flex justify-between bg-gray-100 p-2 border-b">
-              <label className="text-sm font-bold mb-1">Birthday</label>
-              <input
-                type="date"
-                value={birthday}
-                onChange={(e) => setBirthday(e.target.value)}
-                disabled={!isEditingProfile}
-                className="text-right bg-transparent focus:outline-none rounded-md p-2 mt-5"
-              />
-            </div>
-            <div className="flex justify-between bg-gray-100 p-2 border-b">
-              <label className="text-sm font-bold mb-1">Gender</label>
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                disabled={!isEditingProfile}
-                className="bg-transparent focus:outline-none text-right rounded-md p-2 mt-5"
-              >
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div className="flex flex-col bg-gray-100 p-2 border-b rounded-b-lg">
-              <label className="text-sm font-bold mb-1">Bio</label>
-              <input
-                type="text"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                disabled={!isEditingProfile}
-                className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
-              />
-            </div>
+          <div className="mb-4">
+            <label htmlFor="username" className="block font-semibold">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="email" className="block font-semibold">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="birthday" className="block font-semibold">Birthday</label>
+            <input
+              id="birthday"
+              type="date"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="gender" className="block font-semibold">Gender</label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="bio" className="block font-semibold">Bio</label>
+            <textarea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="school" className="block font-semibold">School</label>
+            <input
+              id="school"
+              type="text"
+              value={school}
+              onChange={(e) => setSchool(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="course" className="block font-semibold">Course</label>
+            <input
+              id="course"
+              type="text"
+              value={course}
+              onChange={(e) => setCourse(e.target.value)}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="distance" className="block font-semibold">Distance</label>
+            <input
+              id="distance"
+              type="number"
+              value={distance}
+              onChange={(e) => setDistance(Number(e.target.value))}
+              disabled={!isEditingProfile}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
           </div>
         </section>
 
         {/* Hobbies Section */}
         <section className="mt-6">
-          <div className="bg-gray-100 p-3 border-b rounded-lg flex justify-between items-center">
-            <label className="text-sm font-bold mb-1">Hobbies</label>
-            <button
-              onClick={() => setShowHobbiesModal(true)}
-              disabled={!isEditingProfile}
-              className="bg-[#4530a7] text-white py-2 px-4 font-semibold text-sm rounded-md disabled:opacity-50"
-            >
-              Add Hobby
-            </button>
-          </div>
+          <button
+            onClick={() => setShowHobbiesModal(true)}
+            disabled={!isEditingProfile}
+            className="bg-[#4530a7] text-white py-2 px-4 font-semibold text-sm rounded-md disabled:opacity-50"
+          >
+            Add Hobby
+          </button>
           <div className="flex flex-wrap mt-2">
             {hobbies.length > 0 &&
               hobbies.map((hobby, index) => (
@@ -148,67 +210,13 @@ export default function ProfileSettingsPage() {
           </div>
         </section>
 
-        {/* Education Section */}
-        <section className="mt-6">
-          <div className="space-y-4">
-            <div className="flex flex-col bg-gray-100 p-2 border-b rounded-lg">
-              <label className="text-sm font-bold mb-1">School</label>
-              <input
-                type="text"
-                value={school}
-                onChange={(e) => setSchool(e.target.value)}
-                disabled={!isEditingProfile}
-                className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
-              />
-            </div>
-            <div className="flex flex-col bg-gray-100 p-2 border-b rounded-lg">
-              <label className="text-sm font-bold mb-1">Course and Year</label>
-              <input
-                type="text"
-                value={course}
-                onChange={(e) => setCourse(e.target.value)}
-                disabled={!isEditingProfile}
-                className="w-full bg-transparent focus:outline-none text-right rounded-md p-2"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Discovery Settings */}
-        <section className="mt-6">
-          <div className="bg-gray-100 p-3 border-b rounded-lg">
-            <label className="text-sm font-bold mb-1">Distance Preference</label>
-            <input
-              type="range"
-              min="10"
-              max="100"
-              value={distance}
-              onChange={(e) => setDistance(Number(e.target.value))}
-              disabled={!isEditingProfile}
-              className="w-full accent-[#4530a7] mt-5"
-            />
-            <div className="text-right">{distance} km</div>
-          </div>
-        </section>
-
-        {/* Edit/Save Button */}
-        <div className="mt-6">
-          {!isEditingProfile ? (
-            <button
-              onClick={handleEditProfile}
-              className="w-full bg-[#4530a7] text-white py-3 font-semibold text-lg rounded-full"
-            >
-              Edit Profile
-            </button>
-          ) : (
-            <button
-              onClick={handleSaveChanges}
-              className="w-full bg-[#4530a7] text-white py-3 font-semibold text-lg rounded-full"
-            >
-              Save Changes
-            </button>
-          )}
-        </div>
+        {/* Save Changes Button */}
+        <button
+          onClick={handleSaveChanges}
+          className="w-full bg-[#4530a7] text-white py-3 font-semibold text-lg rounded-full"
+        >
+          Save Changes
+        </button>
       </div>
 
       {/* Profile Pics Section */}
@@ -221,31 +229,30 @@ export default function ProfileSettingsPage() {
         ) : (
           <ProfilePics
             images={profileImages}
-            onEdit={() => setIsEditingProfilePics(true)} // Show ProfilePicsEdit when editing
-            name="Jake Bajo" // Pass name
-            birthday="2002-01-01" // Pass birthday
-            course="BSCS" // Pass course
-            year={3} // Pass year
-            approved={true} // Set this to true or false based on the user's approval status
-            school="Cebu Institute of Technology - University" // Pass school
-            bio="i love you"
+            onEdit={() => setIsEditingProfilePics(true)}
+            name={username}
+            birthday={birthday}
+            course={course}
+            year={3}
+            approved={true}
+            school={school}
+            bio={bio}
           />
         )}
       </div>
 
-        {/* Modal for Save Changes */}
-      {showSaveChangesModal && (
-        <SaveChangesModal 
-        onClose={handleCloseSaveChangesModal} 
-        onSave={handleConfirmSaveChanges} // Pass onSave prop to modal
-        />
-      )}
-      {/* Modal */}
+      {/* Modals */}
       {showHobbiesModal && (
         <HobbiesModal
           onClose={() => setShowHobbiesModal(false)}
           onSave={handleSaveHobbies}
-          initialHobbies={hobbies}
+          initialHobbies={hobbies}	
+        />
+      )}
+      {showSaveChangesModal && (
+        <SaveChangesModal
+          onClose={handleCloseSaveChangesModal}
+          onSave={handleConfirmSaveChanges}
         />
       )}
     </div>

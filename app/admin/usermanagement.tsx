@@ -1,5 +1,8 @@
+"use client";
+
 import React, { useState } from "react";
 import ApproveModal from "./modals/approve";
+import useSWR, { mutate } from "swr";
 
 interface User {
   id: number;
@@ -13,214 +16,29 @@ interface User {
   profilePics: string[];
   approved: boolean;
   selectedImageIndex: number;
-  createdAt: string;  // Added field for date of creation
+  createdAt: string;
 }
 
-const usersPerPage = 6;
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([
-      {
-        id: 1,
-        name: "Alice Johnson",
-        email: "alice.johnson@example.com",
-        birthday: "1998-05-20",
-        course: "BS Computer Science",
-        year: 3,
-        school: "CIT-U",
-        gender: "Female",
-        profilePics: [
-          "/images/2.png",
-          "/images/5.png",
-          "/images/3.png",
-          "/images/1.png",
-          "/images/6.png",
-          "/images/4.png",
-        ],
-        approved: false,
-        selectedImageIndex: 0,
-        createdAt: "2023-01-15T08:00:00Z",
-      },
-      {
-        id: 2,
-        name: "John Smith",
-        email: "john.smith@example.com",
-        birthday: "1999-12-15",
-        course: "BS Information Technology",
-        year: 4,
-        school: "CIT-U",
-        gender: "Male",
-        profilePics: [
-          "/images/4.png",
-          "/images/1.png",
-          "/images/6.png",
-          "/images/3.png",
-          "/images/2.png",
-          "/images/5.png",
-        ],
-        approved: true,
-        selectedImageIndex: 0,
-        createdAt: "2023-02-20T10:30:00Z",
-      },
-      {
-        id: 3,
-        name: "Maria Garcia",
-        email: "maria.garcia@example.com",
-        birthday: "2000-03-10",
-        course: "BS Nursing",
-        year: 2,
-        school: "Cebu Doctors' University",
-        gender: "Female",
-        profilePics: [
-          "/images/3.png",
-          "/images/5.png",
-          "/images/4.png",
-          "/images/2.png",
-          "/images/6.png",
-          "/images/1.png",
-        ],
-        approved: false,
-        selectedImageIndex: 1,
-        createdAt: "2023-03-05T09:15:00Z",
-      },
-      {
-        id: 4,
-        name: "James Brown",
-        email: "james.brown@example.com",
-        birthday: "1997-07-22",
-        course: "BS Civil Engineering",
-        year: 5,
-        school: "University of San Carlos",
-        gender: "Male",
-        profilePics: [
-          "/images/6.png",
-          "/images/2.png",
-          "/images/5.png",
-          "/images/3.png",
-          "/images/1.png",
-          "/images/4.png",
-        ],
-        approved: true,
-        selectedImageIndex: 2,
-        createdAt: "2023-04-10T11:45:00Z",
-      },
-      {
-        id: 5,
-        name: "Sophia Davis",
-        email: "sophia.davis@example.com",
-        birthday: "2001-11-05",
-        course: "BS Architecture",
-        year: 1,
-        school: "CIT-U",
-        gender: "Female",
-        profilePics: [
-          "/images/1.png",
-          "/images/6.png",
-          "/images/4.png",
-          "/images/5.png",
-          "/images/3.png",
-          "/images/2.png",
-        ],
-        approved: false,
-        selectedImageIndex: 0,
-        createdAt: "2023-05-25T14:00:00Z",
-      },
-      {
-        id: 6,
-        name: "Liam Martinez",
-        email: "liam.martinez@example.com",
-        birthday: "2000-09-18",
-        course: "BS Mechanical Engineering",
-        year: 4,
-        school: "University of the Visayas",
-        gender: "Male",
-        profilePics: [
-          "/images/5.png",
-          "/images/4.png",
-          "/images/1.png",
-          "/images/3.png",
-          "/images/6.png",
-          "/images/2.png",
-        ],
-        approved: true,
-        selectedImageIndex: 1,
-        createdAt: "2023-06-12T16:20:00Z",
-      },
-      {
-        id: 7,
-        name: "Isabella Wilson",
-        email: "isabella.wilson@example.com",
-        birthday: "2002-02-14",
-        course: "BS Accountancy",
-        year: 2,
-        school: "Cebu Normal University",
-        gender: "Female",
-        profilePics: [
-          "/images/4.png",
-          "/images/2.png",
-          "/images/6.png",
-          "/images/5.png",
-          "/images/1.png",
-          "/images/3.png",
-        ],
-        approved: false,
-        selectedImageIndex: 2,
-        createdAt: "2023-07-05T08:10:00Z",
-      },
-      {
-        id: 8,
-        name: "Ethan Hernandez",
-        email: "ethan.hernandez@example.com",
-        birthday: "1998-04-09",
-        course: "BS Electronics Engineering",
-        year: 5,
-        school: "University of Cebu",
-        gender: "Male",
-        profilePics: [
-          "/images/6.png",
-          "/images/3.png",
-          "/images/5.png",
-          "/images/2.png",
-          "/images/4.png",
-          "/images/1.png",
-        ],
-        approved: true,
-        selectedImageIndex: 0,
-        createdAt: "2023-08-01T12:30:00Z",
-      },
-      {
-        id: 9,
-        name: "Emma Thompson",
-        email: "emma.thompson@example.com",
-        birthday: "1999-06-30",
-        course: "BS Education",
-        year: 3,
-        school: "CIT-U",
-        gender: "Female",
-        profilePics: [
-          "/images/3.png",
-          "/images/1.png",
-          "/images/2.png",
-          "/images/4.png",
-          "/images/6.png",
-          "/images/5.png",
-        ],
-        approved: false,
-        selectedImageIndex: 1,
-        createdAt: "2023-09-10T15:40:00Z",
-      },    
-  ]);
-
+  const { data: users, error } = useSWR<User[]>(
+    "https://localhost:7113/api/users",
+    fetcher
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchBy, setSearchBy] = useState<"name" | "school" | "course">("name");
   const [sortCriteria, setSortCriteria] = useState<"year" | "birthday" | "createdAt">("year");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const totalPages = Math.ceil(users.length / usersPerPage);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [modalUser, setModalUser] = useState<User | null>(null);
+
+  if (error) return <div>Error loading users.</div>;
+  if (!users) return <div>Loading...</div>;
+
+  const usersPerPage = 6;
+  const totalPages = Math.ceil(users.length / usersPerPage);
 
   const openApproveModal = (user: User) => {
     setModalUser(user);
@@ -232,33 +50,37 @@ const UserManagement: React.FC = () => {
     setModalUser(null);
   };
 
-  const handleApproval = () => {
+  const handleApproval = async () => {
     if (modalUser) {
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id === modalUser.id
-            ? { ...user, approved: !user.approved }
-            : user
-        )
-      );
-      closeApproveModal();
+      try {
+        const updatedUser = { ...modalUser, approved: !modalUser.approved };
+        await fetch(`https://localhost:7113/api/users/${modalUser.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedUser),
+        });
+        mutate("https://localhost:7113/api/users");
+        closeApproveModal();
+      } catch (err) {
+        console.error("Failed to update user approval status", err);
+      }
     }
   };
 
   const handleImageChange = (userId: number, direction: "prev" | "next") => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              selectedImageIndex:
-                direction === "next"
-                  ? (user.selectedImageIndex + 1) % user.profilePics.length
-                  : (user.selectedImageIndex - 1 + user.profilePics.length) % user.profilePics.length,
-            }
-          : user
-      )
+    const updatedUsers = users.map((user) =>
+      user.id === userId
+        ? {
+            ...user,
+            selectedImageIndex:
+              direction === "next"
+                ? (user.selectedImageIndex + 1) % user.profilePics.length
+                : (user.selectedImageIndex - 1 + user.profilePics.length) %
+                  user.profilePics.length,
+          }
+        : user
     );
+    mutate("https://localhost:7113/api/users", updatedUsers, false);
   };
 
   const handleSort = (criteria: "year" | "birthday" | "createdAt") => {
@@ -269,25 +91,18 @@ const UserManagement: React.FC = () => {
 
   const filteredUsers = users.filter((user) => {
     const query = searchQuery.toLowerCase();
-    if (searchBy === "name") {
-      return user.name.toLowerCase().includes(query);
-    }
-    if (searchBy === "school") {
-      return user.school.toLowerCase().includes(query);
-    }
+    if (searchBy === "name") return user.name.toLowerCase().includes(query);
+    if (searchBy === "school") return user.school.toLowerCase().includes(query);
     return user.course.toLowerCase().includes(query);
   });
 
   const sortedUsers = filteredUsers.sort((a, b) => {
     let comparison = 0;
-
-    if (sortCriteria === "year") {
-      comparison = a.year - b.year;
-    } else if (sortCriteria === "birthday") {
+    if (sortCriteria === "year") comparison = a.year - b.year;
+    else if (sortCriteria === "birthday")
       comparison = new Date(a.birthday).getTime() - new Date(b.birthday).getTime();
-    } else if (sortCriteria === "createdAt") {
+    else if (sortCriteria === "createdAt")
       comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    }
 
     return sortDirection === "asc" ? comparison : -comparison;
   });
@@ -298,15 +113,11 @@ const UserManagement: React.FC = () => {
   );
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
   return (
@@ -355,6 +166,7 @@ const UserManagement: React.FC = () => {
         </button>
       </div>
 
+      {/* User Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {paginatedUsers.map((user) => (
           <div
@@ -369,10 +181,7 @@ const UserManagement: React.FC = () => {
               />
               {user.approved && (
                 <div className="absolute top-0 right-0 rounded-full w-6 h-6 flex items-center justify-center">
-                  <img
-                    src="/images/approve.png"
-                    alt="Approved"
-                  />
+                  <img src="/images/approve.png" alt="Approved" />
                 </div>
               )}
               <div className="absolute top-1/2 left-0 right-0 flex justify-between px-4">
@@ -411,6 +220,7 @@ const UserManagement: React.FC = () => {
         ))}
       </div>
 
+      {/* Pagination */}
       <div className="flex justify-between items-center mt-6">
         <button
           onClick={handlePrevPage}
@@ -419,9 +229,7 @@ const UserManagement: React.FC = () => {
         >
           Previous
         </button>
-        <span className="text-lg">
-          Page {currentPage} of {totalPages}
-        </span>
+        <span className="text-lg font-semibold">{`Page ${currentPage} of ${totalPages}`}</span>
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
@@ -431,17 +239,13 @@ const UserManagement: React.FC = () => {
         </button>
       </div>
 
+      {/* Modal */}
       {modalVisible && modalUser && (
         <ApproveModal
-          visible={modalVisible}
-          user={{
-            name: modalUser.name,
-            profilePics: modalUser.profilePics,
-            approved: modalUser.approved,
-            selectedImageIndex: modalUser.selectedImageIndex,
-          }}
-          onClose={closeApproveModal}
+          visible={modalVisible} // Pass the visible prop
+          user={modalUser}
           onApprove={handleApproval}
+          onClose={closeApproveModal}
         />
       )}
     </div>
