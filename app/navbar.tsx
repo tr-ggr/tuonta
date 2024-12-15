@@ -154,6 +154,7 @@ export const NotificationView = () => {
 
 export const Navbar = () => {
   const pathname = usePathname()
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   if (pathname === "/" || pathname === "/signup" || pathname === "/login" || pathname === "/signup/registration") return;
 
   return (

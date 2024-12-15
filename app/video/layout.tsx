@@ -23,3 +23,26 @@ export default function VideoSessionLayout() {
     </div>
   );
 }
+
+
+
+// import React from "react";
+// import { useAuth } from "./AuthContext";
+// import { Participants } from "./Participants";
+// import { ControlBar } from "./ControlBar";
+
+// export const VideoSessionLayout = () => {
+//   const { user } = useAuth(); // Access isAdmin flag
+
+//   return (
+//     <div className="flex h-screen">
+//       <div className="flex-1 flex flex-col">
+//         {/* Participants */}
+//         <Participants />
+
+//         {/* Control Bar */}
+//         <ControlBar />
+//       </div>
+//     </div>
+//   );
+// };
