@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -11,9 +11,9 @@ import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
 import SettingsPage from "./settings/page"; // Import the Settings modal
 import { ScrollArea } from "@/components/ui/scroll-area"
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
+import useSWR from 'swr';
+import { CurrentUser } from "./home/page";
 
 import {
   Card,
@@ -31,6 +31,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { time } from "console";
+import { isWebpackDefaultLayer } from "next/dist/build/utils";
+
+interface NotificationItemProps {
+  id: number;
+  userId: number;
+  title: string;
+  message: string;
+  isRead: boolean;
+  type: string;
+  referenceId: string;
+  dateCreated: string;
+}
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 
 export const NavButton = ({
   isActive,
@@ -86,71 +102,79 @@ export const NotificationFilter = ({children, isActive, onClick} : {onClick : ()
 }
 
 
-export const NotificationItem = ({Type, Title, Message, timestamp, isRead} : {Type : string, Title : string, Message : string, timestamp : string, isRead : boolean}) => {
-  
-  if(isRead){
-    return (
-      <div className="flex w-full h-20 items-center justify-between">
-        <div className="flex w-full items-center gap-4">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+export const NotificationItem = ({ id, userId, title, message, isRead, type, referenceId, dateCreated }: NotificationItemProps) => {
 
-          <div className="flex flex-col">
-            <span className="font-bold">{Title}</span>
-            <span className="text-sm">{Message}</span>
-            <span className="text-xs">{timestamp}</span>
-          </div>
+
+  const url = type == "home" ? `/home` : `/home/${type}/${referenceId}` ;
+
+  return (
+    <Link href={url}>
+    <div className="flex w-full h-20 items-center justify-between">
+              <div className="flex w-full items-center gap-4">
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+
+        <div className="flex flex-col">
+          <span className="font-bold">{title}</span>
+          <span className="text-sm">{message}</span>
+          <span className="text-xs">{new Date(dateCreated).toLocaleString()}</span>
         </div>
-
-        <div className="flex items-center justify-center w-[10px] h-[10px] bg-[#240046] rounded-full p-2"></div>
-
       </div>
-    )
-  } else {
-    return (
-      <div className="flex w-full h-20 items-center justify-between">
-        <div className="flex w-full items-center gap-4">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-  
-          <div className="flex flex-col">
-            <span className="font-bold">{Title}</span>
-            <span className="text-sm">{Message}</span>
-            <span className="text-xs">{timestamp}</span>
-          </div>
-        </div>
-  
-      </div>
-    )
-  }
 
-  
+      {isRead ? null : <div className="flex items-center justify-center w-[10px] h-[10px] bg-[#240046] rounded-full p-2"></div>}
+
+    </div>
+    </Link>
+  )
 
 }
+ 
 
 export const NotificationView = () => {
+  const { data: notifications, error } = useSWR('https://localhost:7113/api/notification', fetcher);
+  const [filteredNotifications, setFilteredNotifications] = useState<NotificationItemProps[]>([]);
   const [view, setView] = useState("all");
+
+  useEffect(() => {
+    if (notifications) {
+      const currentUserId = Number(CurrentUser.id);
+      const filtered = notifications.filter((notification: NotificationItemProps) => {
+        if (view === "all") return notification.userId === currentUserId;
+        if (view === "match") return notification.userId === currentUserId && notification.type === "home";
+        if (view === "message") return notification.userId === currentUserId && notification.type === "chat";
+        return false;
+      });
+      setFilteredNotifications(filtered);
+    }
+  }, [view, notifications]);
+
+  if (!notifications) return <div>Loading...</div>;
+  if (error) return <div>Error loading notifications</div>;
 
   return (
     <div className="flex flex-col gap-4">
       <span className="font-bold text-2xl">Notifications</span>
 
-      <div className="flex w-full gap-4 ">
+      <div className="flex w-full gap-4">
         <NotificationFilter onClick={() => setView("all")} isActive={view === "all"}>View all</NotificationFilter>
         <NotificationFilter onClick={() => setView("match")} isActive={view === "match"}>Match Request</NotificationFilter>
         <NotificationFilter onClick={() => setView("message")} isActive={view === "message"}>Message</NotificationFilter>
-      </div> 
+      </div>
 
       <ScrollArea className="w-full h-96">
-        <NotificationItem Type="Match" Title="Jake Bajo" Message="Wants to match with you!" timestamp="Just now" isRead={true}/>
+        {filteredNotifications.length > 0 ? (
+          filteredNotifications.map((notification) => (
+            <NotificationItem key={notification.referenceId} {...notification} />
+          ))
+        ) : (
+          <div>No notifications for you...</div>
+        )}
       </ScrollArea>
     </div>
   );
-}
+};
 
 export const Navbar = () => {
   const pathname = usePathname()

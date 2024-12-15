@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import useSWR from 'swr'
 
 import { CurrentUser } from "./page"; 
+import { get } from "http";
 
 type ChatItemProps = {
   chatId: number;
@@ -44,10 +45,28 @@ const useUserName = (userId: number): { name: string; loading: boolean; error: a
   };
 };
 
+function getMatches(){
+  const { data, error } = useSWR(`https://localhost:7113/api/match/matches/${CurrentUser.id}`, fetcher);
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+};
+
+function getUsersOfMatch(matchId: number){
+  const { data, error } = useSWR(`https://localhost:7113/api/match/users/${matchId}`, fetcher);
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+}
+
 export const ChatItem = ({ chatId, user1Id, user2Id, message, timestamp }: ChatItemProps) => {
   const { name, loading, error } = useUserName(Number(CurrentUser.id) == user1Id ? user2Id : user1Id);
 
-  console.log(user2Id)
+  // console.log(user2Id)
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Failed to load user name</div>;
 
@@ -58,7 +77,7 @@ export const ChatItem = ({ chatId, user1Id, user2Id, message, timestamp }: ChatI
           <div className="w-9 h-9 bg-gray-300 rounded-full"></div>
           <div className="flex flex-col">
             <span className="text-sm">{name}</span>
-            <span className="text-xs">{message}</span>
+            <span className="text-xs w-[100px] truncate">{message}</span>
             {/* <span className="text-xs">{new Date(timestamp).toLocaleString()}</span> */}
           </div>
         </div>
@@ -103,7 +122,7 @@ export const Chats = () => {
 
 export const MatchQueueItem = ({ id, username }: { id: number, username: string }) => {
   return (
-    <Link href={`/home/chat/${id}`}>
+    <Link href={`/home/chat/new/${id}`}>
       <div className="flex w-full h-16 bg-white items-center gap-4 rounded-lg p-4 justify-between">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 bg-gray-300 rounded-full"></div>
@@ -118,15 +137,35 @@ export const MatchQueueItem = ({ id, username }: { id: number, username: string 
   );
 };
 
-
 export const MatchQueue = () => {
+  const { data: matches, error: matchesError } = useSWR(`https://localhost:7113/api/match/matches/${CurrentUser.id}`, fetcher);
+  const [matchQueueItems, setMatchQueueItems] = useState<{ id: number, username: string }[]>([]);
+
+  console.log(matches)
+  useEffect(() => {
+    const fetchMatchQueueItems = async () => {
+      if (matches) {
+        const activeMatches = matches.filter((match: any) => match.isActive);
+        const items = await Promise.all(activeMatches.map(async (match: any) => {
+          const users = await fetcher(`https://localhost:7113/api/match/users/${match.id}`);
+          const otherUser = users.find((user: any) => user.id !== Number(CurrentUser.id));
+          return { id: match.id, username: otherUser.username };
+        }));
+        setMatchQueueItems(items);
+      }
+    };
+
+    fetchMatchQueueItems();
+  }, [matches]);
+
+  if (matchesError) return <div>Error loading matches</div>;
+  if (!matches) return <div>Loading...</div>;
+
   return (
     <div className="flex flex-col gap-4">
-      <MatchQueueItem id={1} username="Derrick Ginabot" />
-      <MatchQueueItem id={2} username="Jane Doe" />
-      <MatchQueueItem id={3} username="John Smith" />
-      <MatchQueueItem id={4} username="Alice Johnson" />
-      <MatchQueueItem id={5} username="Bob Brown" />
+      {matchQueueItems.map((item) => (
+        <MatchQueueItem key={item.id} id={item.id} username={item.username} />
+      ))}
     </div>
   );
 };
