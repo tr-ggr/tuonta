@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 
 export const CurrentUser = {
-  id: "1",
+  id: "4",
 }
 
 const fetcher = (e : string) => fetch(e).then(res => res.json())
@@ -44,10 +44,10 @@ function getAllProfiles(excludeUserId: string) {
     .filter((match: any) => match.user1Id == excludeUserId)
     .map((match: any) => match.user2Id);
 
-  console.log(excludedUserIds)
+  // console.log(excludedUserIds)
   const filteredProfiles = profilesData.filter((profile: any) => !excludedUserIds.includes(profile.id) && profile.id != excludeUserId);
 
-  console.log(filteredProfiles);
+  // console.log(filteredProfiles);
 
 
 
@@ -68,10 +68,9 @@ export const CancelButton = ({ onClick }: { onClick: () => void }) => {
 }
 
 export const AcceptButton = ({ userId, onClick }: { userId: string, onClick: () => void }) => {
-  // const router = useRouter();
   const handleAccept = async () => {
     const payload = {
-      user1Id: 1,
+      user1Id: CurrentUser.id,
       user2Id: userId,
       date_created: new Date().toISOString()
     };

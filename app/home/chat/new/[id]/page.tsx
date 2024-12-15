@@ -3,11 +3,12 @@ import useSWR from 'swr'
 import { faCircleXmark,faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from 'next/navigation'
-import { useState, useMemo, useOptimistic, useEffect, useRef } from "react";
+import { useState, useMemo, useOptimistic, useEffect, useRef, use } from "react";
 
 import { CurrentUser } from "@/app/home/page"
+import { NextRouter, useRouter } from 'next/router'
 import {ScrollArea} from "@/components/ui/scroll-area"
-
+import { redirect } from 'next/navigation'
 import Link from "next/link";
 
 type NotificationItemProps = {
@@ -53,13 +54,22 @@ const fetcher = (e : string) => fetch(e).then(res => res.json())
 
 function getProfile(id: any){
     const { data, error } = useSWR(`https://localhost:7113/api/profiles/${id}`, fetcher);
-    // console.log(data)
     return {
       data: data ? data : '',
       loading: !data && !error,
       error
     };
 };
+
+function getUsersOfMatch(matchId: number) {
+  const { data, error } = useSWR(`https://localhost:7113/api/match/users/${matchId}`, fetcher);
+
+  return {
+    data: data ? data.filter((user: any) => user.id != Number(CurrentUser.id)) : [],
+    loading: !data && !error,
+    error
+  };
+}
 
 function getChat(id: any){
     const { data, error } = useSWR(`https://localhost:7113/api/chats/${id}`, fetcher);
@@ -104,8 +114,6 @@ const createNotification = async (notification: { userId: number; title: string;
 
 function getChatProfile(id: any){
     var {data, loading, error } = getChat(id)
-
-
     var {data, loading, error } = getProfile(Number(CurrentUser.id) == data.user1Id ? data.user2Id : data.user1Id)
 
 
@@ -147,24 +155,27 @@ export const ProfileTags = (data : any) => {
 }
 
 export const ProfileOverview = () => {
-    const userData = getChatProfile(useParams().id).data
+    const {data, loading, error } = getUsersOfMatch(Number(useParams().id));
+    const user = data[0]
 
-    // console.log(userData)
+    if (loading) {
+      return <div>Loading data...</div>
+    }
 
     return (
         <div className = "w-1/2 h-full p-2 flex flex-col gap-4 border-l-2">
             <div className = "w-full h-1/2 bg-gray-300 rounded-lg"></div>
             <div className = "flex flex-col gap-1">
-                <span className = "text-2xl font-bold">{userData.username}</span>
-                <span className = "text-md">{userData.school}</span>
-                <span className = "text-xs text-gray-500">{userData.course}</span>
+                <span className = "text-2xl font-bold">{user.username}</span>
+                <span className = "text-md">{user.school}</span>
+                <span className = "text-xs text-gray-500">{user.course}</span>
 
             </div>
 
-            <ProfileTags tags={userData.hobbies}></ProfileTags>
+            <ProfileTags tags={user.hobbies}></ProfileTags>
 
             <div className = "flex-wrap break-all">
-                <span className = "text-gray-500 text-sm font-light ">{userData.bio}</span>
+                <span className = "text-gray-500 text-sm font-light ">{user.bio}</span>
             </div>
 
         </div>
@@ -182,92 +193,75 @@ export const RightChat = ({children} : any) => {
     return ( <div className="w-full h-12 flex justify-end">
         <div className = "flex py-2 px-4 items-center w-fit max-w-[500px] h-fit bg-[#C8B6FF] rounded-lg break-all">{children}</div>
     </div>)
-
 }
 
 export const ChatArea = () => {
-    const { data, loading, error } = getChat(useParams().id);
-
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
-
-    const senderId = CurrentUser.id;
-
-    // console.log(data)
-
     return (
-        <div className="flex flex-col flex-grow gap-4 p-4 h-1 w-full overflow-y-auto">
-            {data.chatItems.map((message: any, index: number) => (
-                message.senderId != senderId ? (
-                    <LeftChat key={index}>{message.message}</LeftChat>
-                ) : (
-                    <RightChat key={index}>{message.message}</RightChat>
-                )
-            ))}
+        <div className="flex flex-col-reverse flex-grow gap-4 items-center p-4 w-full h-full text-lg">
+            DONT FORGET TO SAY HI TO EACH OTHER!
         </div>
     );
 };
 
-export const SendChatButton = ({ chatId, message }: { chatId: string; message: string }) => {
-    const { data: chatData, error } = useSWR(`https://localhost:7113/api/chats/${chatId}`, fetcher);
-  
-    const handleSendChat = async () => {
-      const payload = {
-        chatId: chatId,
-        senderId: 1, // Assuming senderId is 1
-        message: message,
-        timestamp: new Date().toISOString()
-      };
-  
-      try {
-        const response = await fetch('https://localhost:7113/api/chats/items', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-  
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-  
-        const data = await response.json();
-        console.log('Success:', data);
-      } catch (error) {
-        console.error('Error:', error);
-      }
-  
-      if (chatData) {
-        const userId = chatData.user1Id === Number(CurrentUser.id) ? chatData.user2Id : chatData.user1Id;
-        createNotification({ referenceId : chatId, userId: userId, title: "John Doe messaged you", message: message });
-      }
+const SendNewChatButton = ({ chatId, message }: { chatId: string, message: string }) => {
+  const handleSendChat = async () => {
+    
+    const payload = {
+      senderId: Number(CurrentUser.id),
+      message: message,
+      timestamp: new Date().toISOString()
     };
+
+    try {
+      const response = await fetch(`https://localhost:7113/api/match/update/${chatId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log('Success:', data);
+      window.location.href = `/home/chat/${data.id}`;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    
+  };
+
   
-    if (error) return <div>Error loading chat data</div>;
-    if (!chatData) return <div>Loading...</div>;
-  
-    return (
-      <button onClick={handleSendChat}>
-        <FontAwesomeIcon className="text-white" icon={faPaperPlane} />
-      </button>
-    );
+
+  return (
+    <button onClick={handleSendChat} className=" text-white p-2 rounded">
+      <FontAwesomeIcon icon={faPaperPlane} />
+    </button>
+  );
 };
 
 
 
-
 export default function ChatPage() {
-    const {data, loading, error } = getChatProfile(useParams().id)
+    const {data, loading, error } = getUsersOfMatch(Number(useParams().id))
+    console.log(data)
+    const user = data[0]
     const [message, setMessage] = useState("");
+
+    if (loading) {
+      return <div>Loading data...</div>
+    }
 
     return (
         <div className = "flex w-full h-full max-h-full">
             {/* Chat Page */}
             <div className = "flex flex-col w-full h-full max-h-full">
                 <div className = "p-4 flex items-center w-full justify-between h-24 border-b-2">
-                    <span>{data.username}</span>
+                    <span>HAHAHAH</span>
                     <Link href="/home"><FontAwesomeIcon icon={faCircleXmark} /></Link>
                 </div>
 
@@ -275,14 +269,14 @@ export default function ChatPage() {
 
                 <div className = "p-2 flex gap-2 items-center justify-between h-12 bg-[#4530A7]">
                     <input type="text" onChange={(e) => setMessage(e.target.value)} placeholder="Type a message" className = "flex-grow h-full bg-white text-[#1A1A1A] rounded-full p-2"/>
-                    <SendChatButton chatId={String(useParams().id)} message={message} />
+                    <SendNewChatButton chatId={String(useParams().id)} message={message} />
                 </div>
             </div>
 
             
 
             {/* Profile Overview */}
-            <ProfileOverview></ProfileOverview>
+            <ProfileOverview></ProfileOverview> 
         </div>
     )
 }
