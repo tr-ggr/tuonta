@@ -11,12 +11,46 @@ import { useState } from "react";
 import { useRouter } from 'next/navigation'
 
 import useSWR from 'swr'
+import { profile } from "console";
 
 export const CurrentUser = {
-  id: "4",
+  id: "1",
 }
 
 const fetcher = (e : string) => fetch(e).then(res => res.json())
+
+
+const createNotification = async (notification: { userId: number; title: string; message: string, referenceId : string, type : string }) => {
+  const payload = {
+    userId: notification.userId,
+    title: notification.title,
+    message: notification.message,
+    isRead: false,
+    type: notification.type,
+    referenceId: notification.referenceId, // Adjust as needed
+    dateCreated: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch('https://localhost:7113/api/notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    console.log('Notification created:', data);
+  } catch (error) {
+    console.error('Error creating notification:', error);
+  }
+};
+
 
 function getAllProfiles(excludeUserId: string) {
 
@@ -67,7 +101,7 @@ export const CancelButton = ({ onClick }: { onClick: () => void }) => {
     )
 }
 
-export const AcceptButton = ({ userId, onClick }: { userId: string, onClick: () => void }) => {
+export const AcceptButton = ({ userId, onClick, isDisabled }: { isDisabled : boolean, userId: string, onClick: () => void }) => {
   const handleAccept = async () => {
     const payload = {
       user1Id: CurrentUser.id,
@@ -96,6 +130,7 @@ export const AcceptButton = ({ userId, onClick }: { userId: string, onClick: () 
     }
 
     onClick();
+    createNotification({ userId: Number(userId), title: "You have a new match!", message: "You have a new match!", referenceId: CurrentUser.id, type : "home" });
     // router.refresh();
   };
 
@@ -107,6 +142,7 @@ export const AcceptButton = ({ userId, onClick }: { userId: string, onClick: () 
       whileTap={{ scale: 0.95 }}
       className="w-16 h-16 flex items-center justify-center rounded-3xl bg-[#D9D9D9]"
       onClick={handleAccept}
+      disabled={isDisabled}
     >
       <FontAwesomeIcon icon={faHeart} />
     </motion.button>
@@ -139,17 +175,22 @@ export default function HomePage() {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length);
   };
 
-  const currentProfile = profiles[currentIndex];
+  var currentProfile = null
+
+  if(profiles.length != 0){
+    currentProfile = profiles[currentIndex];
+  }
 
   // console.log(currentProfile);
 
   return (
     <div className="w-full justify-between h-full flex flex-col items-center">
-      <MatchCard profile={currentProfile} />
+      {currentProfile == null ? <div className="w-full h-full flex justify-center items-center">NO MORE MATCHES</div> : <MatchCard profile={currentProfile} />}
+      
 
       <div className = "flex justify-around items-center w-1/3 h-24 bg-[#4530A7] rounded-t-3xl">
         <CancelButton onClick={handleNextProfile} />
-        <AcceptButton userId={currentProfile.id} onClick={handleNextProfile} />
+        <AcceptButton isDisabled={profiles.length == 0 ? true : false} userId={profiles.length == 0 ? 0 : currentProfile.id} onClick={handleNextProfile} />
       </div>
     </div>
   )
