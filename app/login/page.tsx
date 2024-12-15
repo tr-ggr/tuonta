@@ -83,7 +83,7 @@ export default function login(){
                             <Link href = "/signup">
                                 <button type="submit" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-bold rounded-full text-lg w-full h-11 flex items-center justify-center">
                                 <span className="flex items-center space-x-3">
-                                    <span>Create account</span>
+                                    <span>Login</span>
                                 </span>
                                 </button>
                             </Link>
