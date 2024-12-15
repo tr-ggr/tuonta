@@ -25,9 +25,9 @@ export default function signup(){
     const [roles, setRoles] = useState("");
     const [passwordsMatch, setPasswordsMatch] = useState(true);
     const [emailValid, setEmailValid] = useState(true);
-
+    const [confirmpass, setConfirm] = useState("");
     const validatePasswords = () => {
-        if (formData.password !== formData.confirmpassword) {
+        if (formData.password !== confirmpass) {
             setPasswordsMatch(false);
         } else {
             setPasswordsMatch(true);
@@ -51,7 +51,7 @@ export default function signup(){
         country: '',
         city: '',
         province: '',
-        barangay:'',
+        street:'',
         course: '',
         school: '',
         role: '',
@@ -60,7 +60,6 @@ export default function signup(){
         lastname: '',
         email: '',
         password: '',
-        confirmpassword: '',
     });
     
     const [error, setError] = useState("");
@@ -82,24 +81,23 @@ export default function signup(){
     
     const handleSubmit = async (e : any) => {
     e.preventDefault();
+    try {
+      const response = await fetch('/api/profiles/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    // try {
-    //   const response = await fetch('/api/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(formData),
-    //   });
+      if (!response.ok) throw new Error('Invalid credentials');
 
-    //   if (!response.ok) throw new Error('Invalid credentials');
-
-    //   const data = await response.json();
-    //   setSuccess('Login successful!');
-    //   setError("");
-    //   console.log('User token:', data.token);
-    // } catch (err : any) {
-    //   setError(err.message);
-    //   setSuccess("");
-    // }
+      const data = await response.json();
+      setSuccess('Login successful!');
+      setError("");
+      console.log('User token:', data.token);
+    } catch (err : any) {
+      setError(err.message);
+      setSuccess("");
+    }
     };
 
     return (
@@ -170,10 +168,9 @@ export default function signup(){
                         <div>
                             <input 
                                 type="password"
-                                name="confirmpassword"
                                 placeholder="Confirm password"
-                                value={formData.confirmpassword}
-                                onChange={handleChange}
+                                value={confirmpass}
+                                onChange={(e) => setConfirm(e.target.value)}
                                 required
                                 className="bg-white w-full h-10 border border-neutral-400 rounded-full pl-4"
                             /> 
@@ -317,9 +314,9 @@ export default function signup(){
                                         <div>
                                             <input 
                                                 type="text"
-                                                name="barangay"
-                                                placeholder="Barangay"
-                                                value={formData.barangay}
+                                                name="street"
+                                                placeholder="Street"
+                                                value={formData.street}
                                                 onChange={handleChange}
                                                 required
                                                 className="text-black bg-white w-[150px] h-10 border rounded-full pl-4"
