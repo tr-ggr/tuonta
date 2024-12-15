@@ -2,25 +2,27 @@
 
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faCamera, faShareSquare } from "@fortawesome/free-solid-svg-icons";
+import { faMicrophone, faCamera, faShareSquare, faPhoneSlash } from "@fortawesome/free-solid-svg-icons";
 
 export const ControlBar = () => {
   return (
-    <div className="w-full h-16 bg-[#4530A7] flex justify-around items-center">
+    <div className="w-full h-20 bg-white flex justify-center items-center gap-x-28">
       <ControlButton icon={faMicrophone} />
       <ControlButton icon={faCamera} />
       <ControlButton icon={faShareSquare} />
+      <ControlButton icon={faPhoneSlash} isEndCall />
     </div>
   );
 };
 
-
-const ControlButton = ({ icon }: { icon: any }) => {
+const ControlButton = ({ icon, isEndCall }: { icon: any; isEndCall?: boolean }) => {
   return (
     <motion.button
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
-      className="w-12 h-12 flex items-center justify-center rounded-full bg-[#D9D9D9]"
+      className={`w-12 h-12 flex items-center justify-center rounded-full ${
+        isEndCall ? "bg-red-500 text-white" : "bg-[#D9D9D9]"
+      }`}
     >
       <FontAwesomeIcon icon={icon} />
     </motion.button>

@@ -278,12 +278,17 @@ export const FloatingButton = ({ type }: any) => {
             </div>
 
             {/* Create Session Button - At the bottom of the modal */}
-            <button
-              type="submit"
-              className="w-full p-3 bg-violet-600 hover:bg-violet-900 text-white rounded-md"
+
+
+            <Link
+              href="/video"
+              className="w-full p-3 bg-violet-600 hover:bg-violet-900 text-white rounded-md text-center"
             >
-              Create
-            </button>
+              Create Study Session
+              </Link>
+
+
+            
 
             {/* Close Button */}
             <button
