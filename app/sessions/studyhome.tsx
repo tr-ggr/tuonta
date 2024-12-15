@@ -1,148 +1,95 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useState } from "react";
 
-export const FeaturedItem = ({
-  picture,
-  title,
-  tags,
-  viewers,
-}: {
-  picture: string;
-  title: string;
-  tags: string[];
-  viewers: number;
-}) => {
-  return (
-    <div className="flex h-fit w-[500px] flex-col gap-2">
-      <div className="h-56  bg-slate-600"></div>
-      <div className="flex justify-between gap-2">
-        <span className="font-bold">{title}</span>
-        <span className="text-xs">{viewers} viewers</span>
-      </div>
-
-      <div className="flex gap-2">
-        {tags.map((tag) => (
-          <span className="text-xs bg-[#F2DFFD] px-2 py-1 rounded-full">
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-export const Featured = () => {
-  return (
-    <div className="flex gap-12 w-full p-4 overflow-x-auto [&>div]:flex-shrink-0">
-      <FeaturedItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <FeaturedItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <FeaturedItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <FeaturedItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <FeaturedItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <FeaturedItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-    </div>
-  );
-};
+interface StudySession {
+  id: number;
+  sessionName: string;
+  sessionCreator: string;
+  participantCount: number;
+  groupType: boolean;
+}
 
 export const SmallViewItem = ({
-  picture,
+  id,
   title,
-  tags,
-  viewers,
+  creator,
+  participants,
+  groupType,
 }: {
-  picture: string;
+  id: number;
   title: string;
-  tags: string[];
-  viewers: number;
+  creator: string;
+  participants: number;
+  groupType: boolean;
 }) => {
   return (
-    <div className="flex h-fit w-[300px] flex-col gap-2">
-      <div className="h-40  bg-slate-600"></div>
-      <div className="flex justify-between gap-2">
-        <span className="font-bold">{title}</span>
-        <span className="text-xs">{viewers} viewers</span>
-      </div>
-
-      <div className="flex gap-2">
-        {tags.map((tag) => (
+    <Link href={`/video/${id}`}>
+      <div className="flex h-fit w-[300px] flex-col gap-2 cursor-pointer">
+        <div className="h-40 bg-slate-600"></div>
+        <div className="flex justify-between gap-2">
+          <span className="font-bold">{title}</span>
+          <span className="text-xs">{participants} participants</span>
+        </div>
+        <div className="flex gap-2">
           <span className="text-xs bg-[#F2DFFD] px-2 py-1 rounded-full">
-            {tag}
+            {groupType ? "Public" : "Private"}
           </span>
-        ))}
+          <span className="text-xs bg-[#F2DFFD] px-2 py-1 rounded-full">
+            {creator}
+          </span>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
 export const SmallView = ({ type }: { type: string }) => {
+  const [studySessions, setStudySessions] = useState<StudySession[]>([]);
+
+  useEffect(() => {
+    const fetchStudySessions = async () => {
+      try {
+        const response = await fetch('https://localhost:7113/api/videosessions');
+        if (response.ok) {
+          const data = await response.json();
+          // Sort the study sessions by id in descending order
+          const sortedData = data.sort((a: StudySession, b: StudySession) => b.id - a.id);
+          setStudySessions(sortedData);
+        } else {
+          console.error('Failed to fetch study sessions');
+        }
+      } catch (error) {
+        console.error('Error fetching study sessions:', error);
+      }
+    };
+
+    fetchStudySessions();
+  }, []);
+
+  const getRandomParticipants = () => Math.floor(Math.random() * 15) + 1;
+
   return (
     <div className="flex gap-12 w-full p-4 overflow-x-auto [&>div]:flex-shrink-0">
-      <SmallViewItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <SmallViewItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <SmallViewItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <SmallViewItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
-      <SmallViewItem
-        picture="lol"
-        title="Study Session 1"
-        tags={["Mathematics", "Algebra"]}
-        viewers={12}
-      />
+      {studySessions.map((session) => (
+        <SmallViewItem
+          key={session.id}
+          id={session.id}
+          title={session.sessionName}
+          creator={session.sessionCreator}
+          participants={getRandomParticipants()}
+          groupType={session.groupType}
+        />
+      ))}
     </div>
   );
 };
+
+
+
+
+
 
 
 
@@ -160,6 +107,39 @@ export const FloatingButton = ({ type }: any) => {
 
   const handleCoverChange = (image: string) => {
     setCoverImage(image);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const sessionData = {
+      sessionName: sessionTitle,
+      sessionCreator: 'creator-name', // Replace with the actual session creator's name
+      participantCount: 0, // Initial participants count
+      groupType: privacy == "public", // Convert to boolean
+    };
+
+    // Prepare to send data to the ASP.NET backend
+    try {
+      const response = await fetch('https://localhost:7113/api/videosessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sessionData),
+      });
+
+      if (response.ok) {
+        // Redirect to the layout page with the session details as query parameters
+        const data = await response.json();
+        console.log(data)
+        window.location.href = `/video/${data}`;
+      } else {
+        console.error('Failed to create session');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const coverImages = [
@@ -224,8 +204,8 @@ export const FloatingButton = ({ type }: any) => {
             {/* Left Side: Details and Privacy Section */}
             <div className="flex mb-6">
               {/* Left Side: Details Section */}
-              <div className="w-full md:w-1/2 pr-6">
-                <form>
+              <div className="w-full md:w-full pr-6">
+                <form onSubmit={handleSubmit}>
                   <h2 className="text-xl font-bold mb-4">Details</h2>
                   {/* Session Title */}
                   <input
@@ -237,58 +217,41 @@ export const FloatingButton = ({ type }: any) => {
                   />
 
                   {/* Session Topic Dropdown */}
-                  <select
-                    value={selectedTopic}
-                    onChange={(e) => setSelectedTopic(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded-md"
+                  
+
+                  {/* Privacy Section */}
+                  <h2 className="text-xl font-bold mb-4">Privacy</h2>
+                  <div className="mb-4">
+                    <label className="mr-4">Private</label>
+                    <input
+                      type="radio"
+                      name="privacy"
+                      value="private"
+                      checked={privacy === "private"}
+                      onChange={() => setPrivacy("private")}
+                      className="mr-2"
+                    />
+                    <label className="mr-4">Public</label>
+                    <input
+                      type="radio"
+                      name="privacy"
+                      value="public"
+                      checked={privacy === "public"}
+                      onChange={() => setPrivacy("public")}
+                      className="mr-2"
+                    />
+                  </div>
+
+                  {/* Create Session Button */}
+                  <button
+                    type="submit"
+                    className="w-full p-3 bg-violet-600 hover:bg-violet-900 text-white rounded-md text-center"
                   >
-                    <option value="">Select Topic</option>
-                    <option value="math">Math</option>
-                    <option value="science">Science</option>
-                    <option value="history">History</option>
-                    <option value="literature">Literature</option>
-                  </select>
+                    Create Study Session
+                  </button>
                 </form>
               </div>
-
-              {/* Right Side: Privacy Section */}
-              <div className="w-full md:w-1/2 pl-6">
-                <h2 className="text-xl font-bold mb-4">Privacy</h2>
-                <div className="mb-4">
-                  <label className="mr-4">Private</label>
-                  <input
-                    type="radio"
-                    name="privacy"
-                    value="private"
-                    checked={privacy === "private"}
-                    onChange={() => setPrivacy("private")}
-                    className="mr-2"
-                  />
-                  <label className="mr-4">Public</label>
-                  <input
-                    type="radio"
-                    name="privacy"
-                    value="public"
-                    checked={privacy === "public"}
-                    onChange={() => setPrivacy("public")}
-                    className="mr-2"
-                  />
-                </div>
-              </div>
             </div>
-
-            {/* Create Session Button - At the bottom of the modal */}
-
-
-            <Link
-              href="/video"
-              className="w-full p-3 bg-violet-600 hover:bg-violet-900 text-white rounded-md text-center"
-            >
-              Create Study Session
-              </Link>
-
-
-            
 
             {/* Close Button */}
             <button
@@ -303,30 +266,3 @@ export const FloatingButton = ({ type }: any) => {
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export const FloatingButton = ({ type }:any) => {
-
-//   return (
-//     // <Link href="/sessions/createsession">
-//     <button
-//       className="fixed bottom-6 right-6 bg-violet-600 text-white p-4 rounded-full shadow-lg hover:bg-violet-800 focus:outline-none"
-//     >
-//       +  Create Study Session
-//     </button>
-//     // </Link>
-//   );
-// };
-
