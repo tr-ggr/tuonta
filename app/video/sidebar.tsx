@@ -1,24 +1,65 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faComments, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
-export default function SideBar() {
-  const [activeTab, setActiveTab] = useState("chat");
-  const [dropdownVisible, setDropdownVisible] = useState(null);
 
-  // Sample participants list (replace with dynamic data)
-  const participants = [
-    { id: 1, name: "John Doe", status: "online", videoUrl: "https://via.placeholder.com/100" },
-    { id: 2, name: "Jane Smith", status: "offline", videoUrl: "https://via.placeholder.com/100" },
-    { id: 3, name: "Sam Wilson", status: "online", videoUrl: "https://via.placeholder.com/100" },
-    // Add more participants as needed
-  ];
+interface Participant {
+  id: string;
+  name: string;
+  videoUrl?: string;
+  role?: string;
+}
+
+interface ChatMessage {
+  id: string;
+  senderName: string;
+  senderAvatar?: string;
+  content: string;
+}
+
+interface SideBarProps {
+  participantsData: Participant[];
+  chatMessagesData: ChatMessage[];
+}
+
+export default function SideBar({ participantsData, chatMessagesData }: SideBarProps) {
+  const [activeTab, setActiveTab] = useState("chat");
+  const [dropdownVisible, setDropdownVisible] = useState<string | null>(null);
+  const [participants, setParticipants] = useState<Participant[]>(participantsData || []);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(chatMessagesData || []);
 
   // Function to toggle dropdown visibility
-  const toggleDropdown = (id) => {
+  const toggleDropdown = (id: string) => {
     setDropdownVisible(dropdownVisible === id ? null : id);
   };
+
+  // Function to fetch participants from the backend (example API)
+  const fetchParticipants = async () => {
+    try {
+      const response = await fetch("/api/participants");
+      const data = await response.json();
+      setParticipants(data);
+    } catch (error) {
+      console.error("Error fetching participants:", error);
+    }
+  };
+
+  // Function to fetch chat messages from the backend (example API)
+  const fetchChatMessages = async () => {
+    try {
+      const response = await fetch("/api/chat-messages");
+      const data = await response.json();
+      setChatMessages(data);
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchParticipants();
+    fetchChatMessages();
+  }, []); // Fetch data once on component mount
 
   return (
     <div className="w-1/4 h-full flex flex-col bg-[#F2DFFD]">
@@ -52,29 +93,19 @@ export default function SideBar() {
         <div className="text-black p-4 flex flex-col justify-between h-full">
           {/* Chat Box */}
           <div className="space-y-4 flex-grow overflow-y-auto">
-            <div className="bg-white p-2 rounded-lg flex items-center space-x-4">
-              <img
-                src="https://via.placeholder.com/100" // User's profile image
-                alt="John Doe"
-                className="w-12 h-12 object-cover rounded-full"
-              />
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">John Doe</span>
-                <span className="text-sm">Hello everyone!</span>
+            {chatMessages.map((message) => (
+              <div key={message.id} className="bg-white p-2 rounded-lg flex items-center space-x-4">
+                <img
+                  src={message.senderAvatar || "https://via.placeholder.com/100"} // Dynamic profile image
+                  alt={message.senderName}
+                  className="w-12 h-12 object-cover rounded-full"
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">{message.senderName}</span>
+                  <span className="text-sm">{message.content}</span>
+                </div>
               </div>
-            </div>
-            <div className="bg-white p-2 rounded-lg flex items-center space-x-4">
-              <img
-                src="https://via.placeholder.com/100" // User's profile image
-                alt="Jane Smith"
-                className="w-12 h-12 object-cover rounded-full"
-              />
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">Jane Smith</span>
-                <span className="text-sm">Hi John!</span>
-              </div>
-            </div>
-            {/* Add more chat messages here */}
+            ))}
           </div>
 
           {/* Chat Input */}
@@ -96,13 +127,13 @@ export default function SideBar() {
             {participants.map((participant) => (
               <div key={participant.id} className="flex items-center space-x-4">
                 <img
-                  src={participant.videoUrl}
+                  src={participant.videoUrl || "https://via.placeholder.com/100"}
                   alt={participant.name}
                   className="w-12 h-12 object-cover rounded-full"
                 />
                 <div className="flex flex-col flex-grow">
                   <span className="text-sm font-semibold">{participant.name}</span>
-                  <span className="text-xs text-gray-400">{participant.status}</span>
+                  <span className="text-xs text-gray-400">{participant.role}</span>
                 </div>
                 <div className="relative">
                   <button
@@ -114,7 +145,6 @@ export default function SideBar() {
                   {dropdownVisible === participant.id && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                       <ul className="py-1">
-                        {/* Normal member options */}
                         <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                           Request Match
                         </li>
