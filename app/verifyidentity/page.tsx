@@ -9,8 +9,6 @@ export default function VerifyIdentityPage() {
   const [backImage, setBackImage] = useState<File | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [showModal, setShowModal] = useState(false); // State to manage modal visibility
-  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false); // New state for modal confirmation
-  const [isSubmitting, setIsSubmitting] = useState(false); // State for submission progress
 
   // Handle document selection
   const handleDocumentSelection = (document: string) => {
@@ -25,50 +23,37 @@ export default function VerifyIdentityPage() {
     }
   };
 
-  // Prepare the data for backend submission
-  const prepareFormData = () => {
-    const formData = new FormData();
-    if (frontImage) formData.append("front_image", frontImage);
-    if (backImage) formData.append("back_image", backImage);
-    if (selectedDocument) formData.append("document_type", selectedDocument);
-    return formData;
-  };
-
   // Handle form submission
-  const handleSubmit = () => {
+  const  handleSubmit = async () => {
+    const payload = {
+        userID: 6,
+    };
+    
+    try {
+        const response = await fetch("https://localhost:7113/api/verifyidentity/submit", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+  
+        const result = await response.json();
+  
+        if (response.ok && result.success) {
+          console.log("Okay!")
+        } else {
+          console.log("Resubmission failed. Please try again later.");
+        }
+      } catch (error) {
+        console.error("Error during resubmission:", error);
+      }
+
     if (frontImage && backImage) {
-      setIsConfirmationVisible(true); // Show confirmation modal
+      setIsVerified(true); // Set verification to true once both images are uploaded
+      setShowModal(true); // Show the modal upon successful submission
     } else {
       alert("Please upload both front and back images.");
-    }
-  };
-
-  // Handle confirmation from the modal
-  const handleConfirmSubmit = async () => {
-    setIsSubmitting(true); // Set submission state to true
-    setIsVerified(true); // Set verification status to true
-    setShowModal(true); // Show the success modal
-    setIsConfirmationVisible(false); // Hide the confirmation modal
-
-    try {
-      const formData = prepareFormData();
-      const response = await fetch("/api/verify-identity", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        alert("Your identity verification request has been submitted successfully.");
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("An error occurred. Please try again later.");
-    } finally {
-      setIsSubmitting(false); // Reset the submitting state
     }
   };
 
@@ -76,10 +61,10 @@ export default function VerifyIdentityPage() {
     <div className="h-screen bg-gray-200 flex flex-col items-center justify-center p-6">
       {/* Document Selection Section */}
       <div className="bg-[#F2DFFD] p-6 rounded-lg shadow-md w-full max-w-lg text-center">
-        <h1 className="text-2xl font-semibold mb-11 text-left">Verify Your Identity</h1>
-
+        <h1 className="text-2xl font-semibold mb-11 text-left">Verify Your Identity</h1> {/* Title inside the box */}
+        
         <h2 className="text-sm font-medium mb-4 text-left">Verify my identity using</h2>
-
+        
         <div className="flex justify-around mb-6 gap-4">
           {["Passport ID", "Driver's License", "Identity Card"].map((doc) => (
             <button
@@ -93,7 +78,7 @@ export default function VerifyIdentityPage() {
             </button>
           ))}
         </div>
-
+        
         {/* Image Upload Section */}
         {selectedDocument && (
           <div className="mt-6 space-y-6">
@@ -140,7 +125,7 @@ export default function VerifyIdentityPage() {
         )}
 
         {/* Submit Button */}
-        {selectedDocument && frontImage && backImage && !isConfirmationVisible && !isSubmitting && (
+        {selectedDocument && frontImage && backImage && (
           <div className="mt-6">
             <button
               onClick={handleSubmit}
@@ -151,44 +136,18 @@ export default function VerifyIdentityPage() {
           </div>
         )}
       </div>
-
+      
       {/* Verification Status */}
-      {isVerified && !showModal && isSubmitting && (
+      {isVerified && !showModal && (
         <div className="mt-6 text-center text-white font-medium">
           <p className="rounded-full p-4 bg-green-500">
-            Your identity is being verified.<br />
+            Your identity is being verified.<br/>
             Please wait 1-2 days for the verification process.
           </p>
         </div>
       )}
 
-      {/* Modal for confirmation */}
-      {isConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-96 text-center">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirm Submission</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to submit your identity verification? It will take 1-2 business days to approve.
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={handleConfirmSubmit}
-                className="w-full bg-[#4530a7] text-white py-3 font-semibold rounded-full"
-              >
-                Yes, Submit
-              </button>
-              <button
-                onClick={() => setIsConfirmationVisible(false)}
-                className="w-full bg-gray-300 text-gray-700 py-3 font-semibold rounded-full"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal for successful submission */}
+      {/* Modal */}
       {showModal && <SubmitModal onClose={() => setShowModal(false)} />}
     </div>
   );

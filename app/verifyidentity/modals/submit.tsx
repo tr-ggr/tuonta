@@ -15,24 +15,8 @@ const SubmitModal: React.FC<SubmitModalProps> = ({ onClose }) => {
     setIsSubmitting(true);
     setSubmissionMessage(null);
 
-    try {
-      const response = await fetch("/api/resubmit-identity", {
-        method: "POST",
-      });
+    console.log("HELLO WOLRD")
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        setSubmissionMessage("Resubmission successful. Please wait for approval.");
-      } else {
-        setSubmissionMessage("Resubmission failed. Please try again later.");
-      }
-    } catch (error) {
-      console.error("Error during resubmission:", error);
-      setSubmissionMessage("An error occurred. Please try again later.");
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (

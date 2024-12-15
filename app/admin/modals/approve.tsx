@@ -3,10 +3,11 @@ import React from "react";
 interface ApproveModalProps {
   visible: boolean;
   user: {
-    name: string;
-    profilePics: string[]; // Array of profile pictures
+    firstName: string;
+    lastName: string;
+    profileImages: string | null; // Use the profileImages field here
     approved: boolean;
-    selectedImageIndex: number; // Add selectedImageIndex here
+    selectedImageIndex: number; // Keep selectedImageIndex here
   } | null;
   onClose: () => void;
   onApprove: () => void;
@@ -20,6 +21,9 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
 }) => {
   if (!visible || !user) return null;
 
+  // Handle profile image, use fallback if profileImages is null or undefined
+  const profilePic = user.profileImages ? user.profileImages : "/default-profile-pic.jpg";
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -31,11 +35,11 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
       >
         <h2 className="text-xl font-bold mb-4 text-center">Manage Approval</h2>
         <img
-          src={user.profilePics[user.selectedImageIndex]} // Use the selected profile picture
+          src={profilePic} // Use the profile picture or fallback
           alt="User profile"
           className="w-32 h-32 object-cover mx-auto rounded-full shadow-lg mb-4"
         />
-        <p className="text-center mb-4 font-semibold">{user.name}</p>
+        <p className="text-center mb-4 font-semibold">{user.firstName} {user.lastName}</p>
         <button
           className={`p-2 rounded text-white w-full ${
             user.approved ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
