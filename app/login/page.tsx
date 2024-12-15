@@ -3,15 +3,63 @@ import React from "react";
 import { useState } from 'react';
 import Link from 'next/link';
 
+interface User {
+    id: number | null
+    username: string | null
+    firstname: string | null
+    lastName: string | null
+    country: string | null
+    city: string | null
+    province: string | null
+    street: string | null
+    email: string | null
+    birthday: string | null
+    gender: string | null
+    bio: string | null
+    school: string | null
+    role: string | null
+    password: string | null
+    course: string | null
+    distance: number | null
+    hobbies: string[] | null
+    profileImages: string[] | null
+    isAdmin: boolean | null
+    isVerified: boolean | null
+}
+
+export let currentUser: User = {
+    id: null,
+    username: null,
+    firstname: null,
+    lastName: null,
+    country: null,
+    city: null,
+    province: null,
+    street: null,
+    email: null,
+    birthday: null,
+    gender: null,
+    bio: null,
+    school: null,
+    role: null,
+    password: null,
+    course: null,
+    distance: null,
+    hobbies: null,
+    profileImages: null,
+    isAdmin: null,
+    isVerified: null,
+};
+
 export default function login(){
 
     const [formData, setFormData] = useState({
-        email: '',
+        username: '',
         password: '',
     });
 
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handleChange = (e : any) => {
         setFormData({
@@ -21,25 +69,42 @@ export default function login(){
     };
 
     const handleSubmit = async (e : any) => {
+        console.log("Enetyred")
         e.preventDefault();
+        try {
+            const response = await fetch('https://localhost:7113/api/profiles', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            });
 
-        // try {
-        //     const response = await fetch('/api/login', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify(formData),
-        //     });
+            if (!response.ok) throw new Error('Invalid credentials');
 
-        //     if (!response.ok) throw new Error('Invalid credentials');
+            const users = await response.json() as User[];
+            currentUser = users.filter((profile) => 
+                profile.username == formData.username && profile.password == formData.password
+            )[0];
+    
+            if (currentUser) {
+                setSuccess('Login successful!');
+                setError("");
 
-        //     const data = await response.json();
-        //     setSuccess('Login successful!');
-        //     setError(null);
-        //     console.log('User token:', data.token);
-        // } catch (err : any) {
-        //     setError(err.message);
-        //     setSuccess(null);
-        // }
+                 // Store userId in document.cookie
+                document.cookie = `userId=${currentUser.id}; path=/; max-age=${60 * 60 * 24}`;
+
+                console.log(currentUser);
+                console.log("Unique log");
+
+                window.location.href = "/home"
+            } else {
+                alert("Wrong username or password")
+            }
+
+        
+        } catch (err : any) {
+            setError(err.message);
+            setSuccess("");
+            console.log(err)
+        }
     };
       
     return (
@@ -57,10 +122,10 @@ export default function login(){
                     <form className = "flex-col flex-wrap content-center justify-center space-y-5 px-10" onSubmit={handleSubmit}>
                         <div>
                             <input 
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={formData.email}
+                                type="text"
+                                name="username"
+                                placeholder="Username"
+                                value={formData.username}
                                 onChange={handleChange}
                                 required
                                 className="bg-white w-full h-10 border border-neutral-400 rounded-full pl-4"
@@ -80,13 +145,11 @@ export default function login(){
                         </div>
 
                         <div>
-                            <Link href = "/signup">
-                                <button type="submit" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-bold rounded-full text-lg w-full h-11 flex items-center justify-center">
-                                <span className="flex items-center space-x-3">
-                                    <span>Login</span>
-                                </span>
-                                </button>
-                            </Link>
+                            <button type="submit" className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 font-bold rounded-full text-lg w-full h-11 flex items-center justify-center">
+                            <span className="flex items-center space-x-3">
+                                <span>Login</span>
+                            </span>
+                            </button>
                         </div>
                     </form>
 
@@ -100,5 +163,4 @@ export default function login(){
             </div>
         </div>
     )
-
 }

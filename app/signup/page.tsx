@@ -25,9 +25,9 @@ export default function signup(){
     const [roles, setRoles] = useState("");
     const [passwordsMatch, setPasswordsMatch] = useState(true);
     const [emailValid, setEmailValid] = useState(true);
-
+    const [confirmpass, setConfirm] = useState("");
     const validatePasswords = () => {
-        if (formData.password !== formData.confirmpassword) {
+        if (formData.password !== confirmpass) {
             setPasswordsMatch(false);
         } else {
             setPasswordsMatch(true);
@@ -51,27 +51,19 @@ export default function signup(){
         country: '',
         city: '',
         province: '',
-        barangay:'',
+        street:'',
         course: '',
         school: '',
         role: '',
-        date: '',
+        birthday: '',
         firstname: '',
         lastname: '',
         email: '',
         password: '',
-        confirmpassword: '',
     });
     
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    
-    useEffect(() => {
-        setFormData((prev) => ({
-          ...prev,
-          date: date ? date.toISOString() : "",
-        }));
-    }, [date]);
     
     const handleChange = (e : any) => {
         setFormData({
@@ -81,26 +73,31 @@ export default function signup(){
     };
     
     const handleSubmit = async (e : any) => {
-    e.preventDefault();
+        console.log("Hello world")
+        e.preventDefault();
+        try {
+        const response = await fetch('https://localhost:7113/api/profiles/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify(formData),
+        });
 
-    // try {
-    //   const response = await fetch('/api/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(formData),
-    //   });
+        if (!response.ok) console.log(response);
 
-    //   if (!response.ok) throw new Error('Invalid credentials');
-
-    //   const data = await response.json();
-    //   setSuccess('Login successful!');
-    //   setError("");
-    //   console.log('User token:', data.token);
-    // } catch (err : any) {
-    //   setError(err.message);
-    //   setSuccess("");
-    // }
+        
+        const data = await response.json();
+        console.log(data)
+        setSuccess('Login successful!');
+        setError("");
+        console.log('User token:', data.token);
+        } catch (err : any) {
+        setError(err.message);
+        setSuccess("");
+        console.log(err)
     };
+}
 
     return (
     <div >
@@ -170,10 +167,9 @@ export default function signup(){
                         <div>
                             <input 
                                 type="password"
-                                name="confirmpassword"
                                 placeholder="Confirm password"
-                                value={formData.confirmpassword}
-                                onChange={handleChange}
+                                value={confirmpass}
+                                onChange={(e) => setConfirm(e.target.value)}
                                 required
                                 className="bg-white w-full h-10 border border-neutral-400 rounded-full pl-4"
                             /> 
@@ -227,10 +223,17 @@ export default function signup(){
                                     /> 
                                 </div>
 
-                                <div className="font-bold">
-                                    <span>Birthday</span>
-                                </div>
                                 <div>
+                                    <input
+                                    name = "birthday"
+                                    type="date"
+                                    placeholder= "MM/DD/YYYY"
+                                    value={formData.birthday}
+                                    onChange={handleChange} 
+                                    className="bg-white w-[320px] text-gray-500 border-gray-500 h-10 border rounded-full px-4"
+                                    />
+                                </div>
+                                {/* <div>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
@@ -255,7 +258,7 @@ export default function signup(){
                                             />
                                         </PopoverContent>
                                     </Popover>
-                                </div>
+                                </div> */}
                                 <div className="font-bold">Gender</div>
                                 <div>
                                     <RadioGroup defaultValue="comfortable" className="inline-grid grid-cols-2 gap-4" >
@@ -317,9 +320,9 @@ export default function signup(){
                                         <div>
                                             <input 
                                                 type="text"
-                                                name="barangay"
-                                                placeholder="Barangay"
-                                                value={formData.barangay}
+                                                name="street"
+                                                placeholder="Street"
+                                                value={formData.street}
                                                 onChange={handleChange}
                                                 required
                                                 className="text-black bg-white w-[150px] h-10 border rounded-full pl-4"
@@ -390,7 +393,7 @@ export default function signup(){
                                 
                                 
                                 
-                                <button type="button" data-modal-hide = "select-modal" onClick={() => {setModalVisible(false); console.log(formData);}} className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 rounded-full text-sm w-2/5 h-11 flex items-center justify-center">
+                                <button type="submit" data-modal-hide = "select-modal" onClick={(e) => {setModalVisible(false);handleSubmit(e);console.log(formData)}} className="drop-shadow-lg text-white bg-indigo-900 hover:bg-blue-800 rounded-full text-sm w-2/5 h-11 flex items-center justify-center">
                                 <span className="flex items-center space-x-3">
                                     <span>Continue</span>
                                 </span>

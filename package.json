@@ -30,6 +30,7 @@
     "lucide-react": "^0.462.0",
     "motion": "^11.13.1",
     "next": "^15.0.4",
+    "next-auth": "^4.24.11",
     "nextjs": "^0.0.3",
     "nodemon": "^3.1.9",
     "radix-ui": "^1.0.1",
