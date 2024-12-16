@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import useSWR from "swr";
+import { CurrentUser } from "../home/page";
 
 interface StudySession {
   id: number;
@@ -9,6 +11,32 @@ interface StudySession {
   sessionCreator: string;
   participantCount: number;
   groupType: boolean;
+}
+
+const fetcher = (e : string) => fetch(e).then(res => res.json())
+
+
+function getProfile(id: any){
+  const { data, error } = useSWR(`https://localhost:7113/api/profiles/${id}`, fetcher);
+  // console.log(data)
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+};
+
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? match[2] : null;
+};
+
+const destroyCookie = (name: string) => {
+  document.cookie = `${name}=; path=/; max-age=0;`;
+};
+
+const getProfileSession = () => {
+  return getProfile(getCookie("userId")).data
 }
 
 export const SmallViewItem = ({
@@ -100,6 +128,8 @@ export const FloatingButton = ({ type }: any) => {
   const [selectedTopic, setSelectedTopic] = useState("");
   const [privacy, setPrivacy] = useState("public");
   const [coverImage, setCoverImage] = useState("/images/banner/b1.jpg");
+  const {data, error} = getProfile(getCookie("userId"))
+
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -114,7 +144,7 @@ export const FloatingButton = ({ type }: any) => {
 
     const sessionData = {
       sessionName: sessionTitle,
-      sessionCreator: 'creator-name', // Replace with the actual session creator's name
+      sessionCreator: data.username, // Replace with the actual session creator's name
       participantCount: 0, // Initial participants count
       groupType: privacy == "public", // Convert to boolean
     };

@@ -6,7 +6,7 @@ interface Participant {
   id: string;
   userId: string;
   name: string;
-  videoFeedUrl?: string;
+  imageUrl?: string;
 }
 
 interface ParticipantsProps {
@@ -15,7 +15,7 @@ interface ParticipantsProps {
 
 export const Participants = ({ participants }: ParticipantsProps) => {
   const [scrollIndex, setScrollIndex] = useState(0);
-  const itemsPerView = 5;
+  const itemsPerView = 4;
   const safeParticipants = participants || [];
 
   const scroll = (direction: "left" | "right") => {
@@ -29,7 +29,7 @@ export const Participants = ({ participants }: ParticipantsProps) => {
   };
 
   return (
-    <div className="w-full p-2 bg-white relative h-48">
+    <div className="w-full p-2 bg-white relative h-32 flex justify-center items-center">
       {/* Left Arrow */}
       {scrollIndex > 0 && (
         <button
@@ -41,16 +41,15 @@ export const Participants = ({ participants }: ParticipantsProps) => {
       )}
 
       {/* Participants List */}
-      <div className="flex overflow-hidden h-full">
+      <div className="flex overflow-hidden h-full justify-center items-center space-x-4">
         {safeParticipants
           .slice(scrollIndex * itemsPerView, (scrollIndex + 1) * itemsPerView)
           .map((participant) => (
-            <div key={participant.id} className="w-1/5 p-1 h-full">
-              <div className="bg-gray-200 p-2 h-full flex flex-col justify-center">
-                <h3 className="text-sm">{participant.name}</h3>
-                <p className="text-xs">User ID: {participant.userId}</p>
-                {participant.videoFeedUrl && (
-                  <video src={participant.videoFeedUrl} controls className="w-full h-auto" />
+            <div key={participant.id} className="w-2/6 p-1 h-full">
+              <div className="bg-gray-200 p-2 h-full flex flex-col justify-center items-center">
+                <h3 className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">{participant.name}</h3>
+                {participant.imageUrl && (
+                  <img src={participant.imageUrl} alt={participant.name} className="w-full h-full object-contain" />
                 )}
               </div>
             </div>
