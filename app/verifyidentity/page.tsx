@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import SubmitModal from "./modals/submit"; // Import the modal
+import { CurrentUser } from "../home/page";
 
 export default function VerifyIdentityPage() {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
@@ -26,7 +27,7 @@ export default function VerifyIdentityPage() {
   // Handle form submission
   const  handleSubmit = async () => {
     const payload = {
-        userID: 6,
+        userID: CurrentUser.id,
     };
     
     try {

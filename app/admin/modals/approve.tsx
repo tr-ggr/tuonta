@@ -3,14 +3,14 @@ import React from "react";
 interface ApproveModalProps {
   visible: boolean;
   user: {
-    firstName: string;
-    lastName: string;
-    profileImages: string | null; // Use the profileImages field here
-    approved: boolean;
-    selectedImageIndex: number; // Keep selectedImageIndex here
+    id: number; // User's unique identifier
+    name: string; // User's name (can be derived from firstName + lastName)
+    profilePics: string[]; // Array of profile pictures
+    approved: boolean; // Current approval status
+    selectedImageIndex: number; // Index of the selected profile image
   } | null;
-  onClose: () => void;
-  onApprove: () => void;
+  onClose: () => void; // Callback to close the modal
+  onApprove: (userId: number, newApprovalStatus: boolean) => void; // Callback to handle approval change
 }
 
 const ApproveModal: React.FC<ApproveModalProps> = ({
@@ -21,8 +21,36 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
 }) => {
   if (!visible || !user) return null;
 
-  // Handle profile image, use fallback if profileImages is null or undefined
-  const profilePic = user.profileImages ? user.profileImages : "/default-profile-pic.jpg";
+  // Safe access to the user's profile picture, fallback to a default if not available
+  const profilePic = user.profilePics?.[user.selectedImageIndex] || "/default-profile-pic.jpg";
+
+  // Function to handle the approval status change
+  const handleApprove = async () => {
+    try {
+      // Send a PUT request to the backend to update the approval status
+      const response = await fetch(`https://localhost:7113/api/verifyidentity/update/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID: user.id, // Pass the user's ID
+          isApproved: !user.approved, // Toggle approval status
+        }),
+      });
+
+      // Check the response status
+      if (response.ok) {
+        // After successfully updating the approval status, call the onApprove callback
+        onApprove(user.id, !user.approved); // Pass the updated approval status
+      } else {
+        // Log error if update fails
+        console.error("Error updating approval status");
+      }
+    } catch (error) {
+      console.error("Error occurred during approval:", error);
+    }
+  };
 
   return (
     <div
@@ -31,22 +59,20 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
     >
       <div
         className="bg-white rounded-lg p-6 max-w-sm w-full"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()} // Prevent click from closing modal
       >
         <h2 className="text-xl font-bold mb-4 text-center">Manage Approval</h2>
         <img
-          src={profilePic} // Use the profile picture or fallback
+          src={profilePic} // Profile image
           alt="User profile"
           className="w-32 h-32 object-cover mx-auto rounded-full shadow-lg mb-4"
         />
-        <p className="text-center mb-4 font-semibold">{user.firstName} {user.lastName}</p>
+        <p className="text-center mb-4 font-semibold">{user.name}</p> {/* Display user name */}
         <button
-          className={`p-2 rounded text-white w-full ${
-            user.approved ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-          }`}
-          onClick={onApprove}
+          className={`p-2 rounded text-white w-full ${user.approved ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"}`}
+          onClick={handleApprove}
         >
-          {user.approved ? "Disapprove" : "Approve"}
+          {user.approved ? "Disapprove" : "Approve"} {/* Toggle button text */}
         </button>
         <button
           className="mt-2 p-2 rounded bg-gray-500 text-white w-full hover:bg-gray-600"
