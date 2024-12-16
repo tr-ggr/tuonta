@@ -1,28 +1,77 @@
 import React from "react";
 
-interface ApproveModalProps {
-  visible: boolean;
-  user: {
-    firstName: string;
-    lastName: string;
-    profileImages: string | null; // Use the profileImages field here
-    approved: boolean;
-    selectedImageIndex: number; // Keep selectedImageIndex here
-  } | null;
-  onClose: () => void;
-  onApprove: () => void;
+interface User {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  province: string;
+  street: string;
+  email: string;
+  birthday: string;
+  gender: string;
+  bio: string | null;
+  school: string;
+  role: string;
+  password: string;
+  course: string;
+  isAdmin: boolean;
+  isVerified: boolean;
+  distance: string | null;
+  hobbies: string | null;
+  profileImages: string | null;
+  selectedImageIndex: number;
+  approved: boolean;
+  profilePics: string[];
+  name: string; // Add a 'name' property
+
 }
 
-const ApproveModal: React.FC<ApproveModalProps> = ({
-  visible,
-  user,
-  onClose,
-  onApprove,
-}) => {
+interface ApproveModalProps {
+  visible: boolean;
+  user: User;
+  onClose: () => void; // Callback to close the modal
+  onApprove: (userId: number, newApprovalStatus: boolean) => void; // Callback to handle approval change
+}
+
+const ApproveModal : React.FC<ApproveModalProps> = ({user, visible, onClose, onApprove}) => {
+
+
+
   if (!visible || !user) return null;
 
-  // Handle profile image, use fallback if profileImages is null or undefined
-  const profilePic = user.profileImages ? user.profileImages : "/default-profile-pic.jpg";
+  const profilePic =
+    user.profilePics?.[user.selectedImageIndex] || "/default-profile-pic.jpg";
+
+  const handleApprove = async () => {
+    
+    try {
+      const response = await fetch(
+        `https://localhost:7113/api/verifyidentity/update`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userID: user.id,
+          }),
+        }
+      );
+
+      console.log(user.id)
+
+      if (response.ok) {
+        onApprove(user.id, !user.approved);
+      } else {
+        console.error("Error updating approval status");
+      }
+    } catch (error) {
+      console.error("Error occurred during approval:", error);
+    }
+  };
 
   return (
     <div
@@ -35,16 +84,18 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
       >
         <h2 className="text-xl font-bold mb-4 text-center">Manage Approval</h2>
         <img
-          src={profilePic} // Use the profile picture or fallback
+          src={profilePic}
           alt="User profile"
           className="w-32 h-32 object-cover mx-auto rounded-full shadow-lg mb-4"
         />
-        <p className="text-center mb-4 font-semibold">{user.firstName} {user.lastName}</p>
+        <p className="text-center mb-4 font-semibold">{user.username }</p>
         <button
           className={`p-2 rounded text-white w-full ${
-            user.approved ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+            user.approved
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-green-500 hover:bg-green-600"
           }`}
-          onClick={onApprove}
+          onClick={handleApprove}
         >
           {user.approved ? "Disapprove" : "Approve"}
         </button>

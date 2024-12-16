@@ -3,8 +3,46 @@
 import React from "react";
 import UserManagement from "./usermanagement"; // Import the UserManagement component
 import Link from "next/link"; // Import Link for navigation
+import useSWR from "swr";
+import { CurrentUser  } from "../home/page";
+
+
+const fetcher = (e : string) => fetch(e).then(res => res.json())
+
+
+function getProfile(id: any){
+  const { data, error } = useSWR(`https://localhost:7113/api/profiles/${id}`, fetcher);
+  // console.log(data)
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+};
+
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? match[2] : null;
+};
+
+const destroyCookie = (name: string) => {
+  document.cookie = `${name}=; path=/; max-age=0;`;
+};
+
+const getProfileSession = () => {
+  return getProfile(getCookie("userId")).data
+}
 
 const AdminPage: React.FC = () => {
+  const {data, loading, error} = getProfile(CurrentUser.id)
+
+  console.log(data.isAdmin)
+
+  if (!data.isAdmin){
+    return <div>NOT ADMIN BRO</div>
+  }
+
+  
   return (
     <div className="flex h-full bg-gray-100 overflow-hidden">
       {/* Admin Dashboard Sidebar */}
