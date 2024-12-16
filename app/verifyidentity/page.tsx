@@ -1,16 +1,32 @@
 "use client"; // Add this directive at the top of your file
-
+import useSWR from "swr";
 import { useState } from "react";
 import SubmitModal from "./modals/submit"; // Import the modal
 import { CurrentUser } from "../home/page";
+import { currentUser } from "../login/page";
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+function getProfile(id: any){
+  const { data, error } = useSWR(`https://localhost:7113/api/profiles/${id}`, fetcher);
+  // console.log(data)
+  return {
+    data: data ? data : '',
+    loading: !data && !error,
+    error
+  };
+};
+
 
 export default function VerifyIdentityPage() {
+  const {data, loading, error} = getProfile(CurrentUser.id)
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [frontImage, setFrontImage] = useState<File | null>(null);
   const [backImage, setBackImage] = useState<File | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [showModal, setShowModal] = useState(false); // State to manage modal visibility
-
+  if(data.isVerified == true)
+    window.location.href = "/home"
+  console.log(data)
   // Handle document selection
   const handleDocumentSelection = (document: string) => {
     setSelectedDocument(document);

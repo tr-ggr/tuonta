@@ -50,13 +50,18 @@ const UserManagement: React.FC = () => {
               return profileData;
             })
           );
-          setProfileDetails(profiles);
+  
+          // Filter out profiles where isApproved is true
+          const filteredProfiles = profiles.filter((profile: any) => !profile.isVerified);
+          console.log(filteredProfiles)
+  
+          setProfileDetails(filteredProfiles);
         }
       } catch (err) {
         console.error("Error fetching profile details:", err);
       }
     };
-
+  
     if (users) {
       fetchProfiles();
     }
@@ -66,6 +71,7 @@ const UserManagement: React.FC = () => {
   if (!users) return <div>Loading...</div>;
 
   const openApproveModal = (user: User) => {
+    // console.log(user)
     setModalUser(user);
     setModalVisible(true);
   };

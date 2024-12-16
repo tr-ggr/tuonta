@@ -1,31 +1,57 @@
 import React, { useState, useEffect } from "react";
 
 interface HobbiesModalProps {
+  isOpen: boolean;
   onClose: () => void;
-  onSave: (hobbies: string[]) => void;
-  initialHobbies: string[];
+  onSave: (selectedHobbies: string[]) => void;
+  selectedHobbies: string[]; // Add this line
+  initialHobbies: string[];  // Add this line
+
 }
+
 
 export default function HobbiesModal({
   onClose,
   onSave,
   initialHobbies,
+  isOpen,
 }: HobbiesModalProps) {
-  const availableHobbies = ["Reading", "Traveling", "Cooking", "Sports", "Music", "Dancing", "Cycling", "Running", "Mind Games", "Movies", "Cafe", "Art"];
+  if (!isOpen) return null; // Return null if modal is not open
+
+  const availableHobbies = [
+    "Reading",
+    "Traveling",
+    "Cooking",
+    "Sports",
+    "Music",
+    "Dancing",
+    "Cycling",
+    "Running",
+    "Mind Games",
+    "Movies",
+    "Cafe",
+    "Art",
+  ];
   const [selectedHobbies, setSelectedHobbies] = useState<string[]>([]);
   const [otherHobby, setOtherHobby] = useState<string>("");
 
   useEffect(() => {
-    const predefinedHobbies = initialHobbies.filter((hobby) => availableHobbies.includes(hobby));
+    const predefinedHobbies = initialHobbies.filter((hobby) =>
+      availableHobbies.includes(hobby)
+    );
     setSelectedHobbies(predefinedHobbies);
 
-    const otherHobbies = initialHobbies.filter((hobby) => !availableHobbies.includes(hobby));
+    const otherHobbies = initialHobbies.filter(
+      (hobby) => !availableHobbies.includes(hobby)
+    );
     setOtherHobby(otherHobbies.join(", "));
   }, [initialHobbies]);
 
   const handleSelectHobby = (hobby: string) => {
     setSelectedHobbies((prev) =>
-      prev.includes(hobby) ? prev.filter((item) => item !== hobby) : [...prev, hobby]
+      prev.includes(hobby)
+        ? prev.filter((item) => item !== hobby)
+        : [...prev, hobby]
     );
   };
 
@@ -33,7 +59,10 @@ export default function HobbiesModal({
     let updatedHobbies = [...selectedHobbies];
 
     if (otherHobby) {
-      const otherHobbiesArray = otherHobby.split(",").map((hobby) => hobby.trim()).filter(Boolean);
+      const otherHobbiesArray = otherHobby
+        .split(",")
+        .map((hobby) => hobby.trim())
+        .filter(Boolean);
       otherHobbiesArray.forEach((hobby) => {
         if (!updatedHobbies.includes(hobby)) {
           updatedHobbies.push(hobby);
